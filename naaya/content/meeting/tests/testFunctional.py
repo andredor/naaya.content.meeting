@@ -287,6 +287,31 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
         self.assertTrue('My Name' in html)
 
 
+    def test_search_for_new_participants(self):
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting')
+        self.assertTrue('http://localhost/portal/info/mymeeting/edit_participants' in self.browser.get_html())
+
+        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        form = self.browser.get_form('formSearchUsers')
+        expected_controls = set(['search_param', 'search_term:utf8:ustring', 'search_user'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+
+        self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_term:utf8:ustring'] = 'contributor'
+        self.browser.submit()
+
+        form = self.browser.get_form('formAddUsers')
+        expected_controls = set(['uid', 'add_users'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+
+        self.browser_do_logout()
 
 def test_suite():
     suite = TestSuite()

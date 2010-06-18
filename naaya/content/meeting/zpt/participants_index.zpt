@@ -1,0 +1,63 @@
+<metal:block define-macro="page" extend-macro="here/standard_template_macro">
+    <metal:block metal:fill-slot="title">
+        <title tal:content="string:${here/title} | ${here/site_title}" />
+    </metal:block>
+
+    <metal:block fill-slot="body">
+    <fieldset>
+        <legend i18n:translate="Search and Add Users"></legend>
+        <p> Use this form to find users and assign them to the meeting. </p>
+        <tal:block define="
+            search_param python:request.get('search_param', '');
+            search_term python:request.get('search_term', '');
+            do_search python:request.has_key('search_user')">
+        <form method="get" action="" name="formSearchUsers">
+            <label for="search_param">Search for</label>
+            <select id="search_param" name="search_param">
+                <option value="uid"
+                     tal:attributes="selected python:search_param=='uid'">
+                    User ID
+                </option>
+                <option value="cn"
+                     tal:attributes="selected python:search_param=='cn'">
+                    User name
+                </option>
+            </select>
+
+            <label for="search_term">containing</label>
+            <input type="text" id="search_term" name="search_term:utf8:ustring" 
+                tal:attributes="value search_term"/>
+
+            <input type="submit" name="search_user" value="Search" />
+        </form>
+
+        <tal:block condition="do_search">
+        <tal:block define="users python:here.findUsers(search_param, search_term)">
+        <form method="post" action="" name="formAddUsers"
+                tal:condition="python:len(users) > 0">
+            <table class="datatable" width="95%">
+                <tr>
+                    <th>Select</th>
+                    <th>User ID</th>
+                    <th>User name</th>
+                    <th witdh="60%">Other information</th>
+                </tr>
+                <tr tal:repeat="item users"
+                        tal:attributes="class python:test(path('repeat/item/odd'), 'odd', 'even')">
+                    <td><input type="checkbox" name="uid" tal:attributes="value item/uid"/></td>
+                    <td><span tal:replace="item/uid"/></td>
+                    <td><span tal:replace="item/cn"/></td>
+                    <td><span tal:replace="item/info"/></td>
+                </tr>
+            </table>
+            <input type="submit" name="add_users" value="Add selected users"/>
+        </form>
+        <div tal:condition="python:len(users) == 0">No users matched selected criteria.</div>
+        </tal:block>
+        </tal:block>
+
+        </tal:block>
+    </fieldset>
+    </metal:block>
+</metal:block>
+

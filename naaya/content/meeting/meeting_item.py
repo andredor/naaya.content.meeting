@@ -51,6 +51,7 @@ from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
+from NyParticipants import NyParticipants
 
 #module constants
 DEFAULT_SCHEMA = {
@@ -220,6 +221,8 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
 
     security = ClassSecurityInfo()
 
+    edit_participants = NyParticipants('edit_participants')
+
     def __init__(self, id, contributor):
         """ """
         self.id = id
@@ -359,6 +362,11 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_edit')
 
+    security.declareProtected(view, 'menusubmissions')
+    def menusubmissions(self, REQUEST=None, RESPONSE=None):
+        """ """
+        return self.getFormsTool().getContent({'here': self}, 'meeting_menusubmissions')
+
     def get_ics(self, REQUEST, RESPONSE):
         """ Export this meeting as 'ics' """
 
@@ -399,6 +407,9 @@ InitializeClass(NyMeeting)
 manage_addNyMeeting_html = PageTemplateFile('zpt/meeting_manage_add', globals())
 manage_addNyMeeting_html.kind = config['meta_type']
 manage_addNyMeeting_html.action = 'addNyMeeting'
+
+#Custom page templates
+NaayaPageTemplateFile('zpt/meeting_menusubmissions', globals(), 'meeting_menusubmissions')
 
 config.update({
     'constructors': (manage_addNyMeeting_html, addNyMeeting),
