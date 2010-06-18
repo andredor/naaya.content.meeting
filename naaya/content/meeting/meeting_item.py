@@ -213,8 +213,7 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
     def manage_options(self):
         """ """
         l_options = ()
-        if not self.hasVersion():
-            l_options += ({'label': 'Properties', 'action': 'manage_edit_html'},)
+        l_options += ({'label': 'Properties', 'action': 'manage_edit_html'},)
         l_options += meeting_item.manage_options
         l_options += ({'label': 'View', 'action': 'index_html'},) + NyItem.manage_options
         return l_options
@@ -311,12 +310,7 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
         if not self.checkPermissionEditObject():
             raise EXCEPTION_NOTAUTHORIZED, EXCEPTION_NOTAUTHORIZED_MSG
 
-        if self.hasVersion():
-            obj = self.version
-            if self.checkout_user != self.REQUEST.AUTHENTICATED_USER.getUserName():
-                raise EXCEPTION_NOTAUTHORIZED, EXCEPTION_NOTAUTHORIZED_MSG
-        else:
-            obj = self
+        obj = self
 
         if REQUEST is not None:
             schema_raw_data = dict(REQUEST.form)
