@@ -36,6 +36,7 @@ from zope.event import notify
 from naaya.content.base.events import NyContentObjectAddEvent
 from naaya.content.base.events import NyContentObjectEditEvent
 from zope.interface import implements
+import zLOG
 
 #Product imports
 from Products.Naaya.NyFolder import NyFolder
@@ -51,6 +52,7 @@ from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
+from naaya.content.meeting import MEETING_ROLE
 from NyParticipants import NyParticipants
 
 #module constants
@@ -87,6 +89,25 @@ config = {
             },
     }
 
+
+
+def meeting_on_install(parent):
+    """ """
+    role = MEETING_ROLE 
+    grouppermissions = ['Add comments']
+    permissions = ['Naaya - Skip Captcha']
+
+    auth_tool = parent.getAuthenticationTool()
+    try:
+        auth_tool.addRole(role, grouppermissions)
+    except:
+        zLOG.LOG('naaya.content.meeting', zLOG.WARNING, '%s role already in the site.' % role)
+
+    auth_tool.editRole(role, grouppermissions)
+    b = [x['name'] for x in parent.permissionsOfRole(role) if x['selected']=='SELECTED']
+    b.extend(permissions)
+    parent.manage_role(role, b)
+    
 def meeting_add_html(self, REQUEST=None, RESPONSE=None):
     """ """
     from Products.NaayaBase.NyContentType import get_schema_helper_for_metatype
@@ -213,15 +234,9 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
 
     def manage_options(self):
         """ """
-        l_options = ()
-        l_options += ({'label': 'Properties', 'action': 'manage_edit_html'},)
-        l_options += meeting_item.manage_options
-        l_options += ({'label': 'View', 'action': 'index_html'},) + NyItem.manage_options
-        return l_options
+        return NyFolder.manage_options
 
     security = ClassSecurityInfo()
-
-    edit_participants = NyParticipants('edit_participants')
 
     def __init__(self, id, contributor):
         """ """
@@ -230,6 +245,7 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
         NyCheckControl.__dict__['__init__'](self)
         NyItem.__dict__['__init__'](self)
         self.contributor = contributor
+        self.edit_participants = NyParticipants('edit_participants', self)
 
     security.declarePrivate('objectkeywords')
     def objectkeywords(self, lang):
@@ -412,6 +428,7 @@ manage_addNyMeeting_html.action = 'addNyMeeting'
 NaayaPageTemplateFile('zpt/meeting_menusubmissions', globals(), 'meeting_menusubmissions')
 
 config.update({
+    'on_install': meeting_on_install,
     'constructors': (manage_addNyMeeting_html, addNyMeeting),
     'folder_constructors': [
             # NyFolder.manage_addNyMeeting_html = manage_addNyMeeting_html

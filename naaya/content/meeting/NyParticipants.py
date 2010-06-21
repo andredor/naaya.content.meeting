@@ -24,17 +24,22 @@ from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import change_permissions
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from persistent.list import PersistentList
 
 #Naaya imports
+from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
+from naaya.content.meeting import MEETING_ROLE
 
 class NyParticipants(SimpleItem):
     security = ClassSecurityInfo()
 
     title = "Edit participants"
 
-    def __init__(self, id):
+    def __init__(self, id, meeting):
         """ """
         self.id = id
+        self.meeting = meeting
+        self.uids = PersistentList()
 
     def findUsers(self, search_param, search_term):
         """ """
@@ -73,6 +78,40 @@ class NyParticipants(SimpleItem):
 
         return ret
 
+    def _add_user(self, uid):
+        self.meeting.manage_setLocalRoles(uid, MEETING_ROLE)
+        self.uids.append(uid)
+
+    def addUsers(self, REQUEST):
+        """ """
+        if 'uid' in REQUEST.form:
+            uid = REQUEST.form['uid']
+            if type(uid) == type([]):
+                for u in uid:
+                    self._add_user(u)
+            else:
+                self._add_user(uid)
+        return REQUEST.RESPONSE.redirect(self.absolute_url())
+
+    def _remove_user(self, uid):
+        self.meeting.manage_delLocalRoles([uid])
+        self.uids.remove(uid)
+
+    def removeUsers(self, REQUEST):
+        """ """
+        if 'uid' in REQUEST.form:
+            uid = REQUEST.form['uid']
+            if type(uid) == type([]):
+                for u in uid:
+                    self._remove_user(u)
+            else:
+                self._remove_user(uid)
+        return REQUEST.RESPONSE.redirect(self.absolute_url())
+
     security.declareProtected(change_permissions, 'index_html')
-    index_html = PageTemplateFile('zpt/participants_index', globals())
+    def index_html(self, REQUEST):
+        """ """
+        return self.getFormsTool().getContent({'here': self}, 'meeting_participants')
+
+NaayaPageTemplateFile('zpt/participants_index', globals(), 'meeting_participants')
 

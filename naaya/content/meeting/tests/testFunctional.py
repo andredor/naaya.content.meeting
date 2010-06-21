@@ -21,6 +21,14 @@ from unittest import TestSuite, makeSuite
 
 from Products.Naaya.tests.NaayaFunctionalTestCase import NaayaFunctionalTestCase
 
+from naaya.content.meeting import MEETING_ROLE
+
+def addPortalMeetingParticipant(portal):
+    portal.acl_users._doAddUser('test_participant', 'participant', [], '', '', '', '')
+
+def removePortalMeetingParticipant(portal):
+    portal.acl_users._doDelUsers(['test_participant'])
+
 class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
     """ CreateTestCase for NyMeeting object """
 
@@ -286,7 +294,6 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
         self.assertTrue('Kogens Nytorv 6, 1050 Copenhagen K, Denmark' in html)
         self.assertTrue('My Name' in html)
 
-
     def test_search_for_new_participants(self):
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
 
@@ -313,10 +320,114 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
 
         self.browser_do_logout()
 
+class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
+    """ ParticipantsTestCase for NyMeeting object """
+
+    def afterSetUp(self):
+        self.portal.manage_install_pluggableitem('Naaya Meeting')
+        from naaya.content.meeting.meeting_item import addNyMeeting
+        addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
+            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
+            contact_person='My Name', contact_email='my.email@my.domain')
+        self.portal.info.mymeeting.approveThis()
+        self.portal.recatalogNyObject(self.portal.info.mymeeting)
+
+        addPortalMeetingParticipant(self.portal)
+        self.portal.info.mymeeting.setRestrictions(access='other', roles=[MEETING_ROLE])
+        import transaction; transaction.commit()
+
+    def beforeTearDown(self):
+        removePortalMeetingParticipant(self.portal)
+        self.portal.info.manage_delObjects(['mymeeting'])
+        self.portal.manage_uninstall_pluggableitem('Naaya Meeting')
+        import transaction; transaction.commit()
+
+    def test_add_participants(self):
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+        self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        form = self.browser.get_form('formSearchUsers')
+        self.assertTrue('test_participant' not in self.browser.get_html())
+
+        self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_term:utf8:ustring'] = 'test_participant'
+        self.browser.submit()
+        form = self.browser.get_form('formAddUsers')
+        expected_controls = set(['uid', 'add_users'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+        self.assertTrue('test_participant' in self.browser.get_html())
+
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['test_participant']
+        self.browser.submit()
+
+        form = self.browser.get_form('formDeleteUsers')
+        expected_controls = set(['uid', 'remove_users'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+        self.assertTrue('test_participant' in self.browser.get_html())
+
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['test_participant']
+        self.browser.submit()
+        self.assertTrue('test_participant' not in self.browser.get_html())
+
+        self.browser_do_logout()
+
+    def test_participant_rights(self):
+        def assert_access():
+            self.browser_do_login('test_participant', 'participant')
+            self.browser.go('http://localhost/portal/info/mymeeting')
+            self.assertTrue('Access denied' not in self.browser.get_html()) 
+            self.browser_do_logout()
+        def assert_no_access():
+            self.browser_do_login('test_participant', 'participant')
+            self.browser.go('http://localhost/portal/info/mymeeting')
+            self.assertTrue('Access denied' in self.browser.get_html()) 
+            self.browser_do_logout()
+
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+        self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.assertTrue('test_participant' not in self.browser.get_html())
+        self.browser_do_logout()
+        assert_no_access()
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        form = self.browser.get_form('formSearchUsers')
+        self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_term:utf8:ustring'] = 'test_participant'
+        self.browser.submit()
+        form = self.browser.get_form('formAddUsers')
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['test_participant']
+        self.browser.submit()
+        self.browser_do_logout()
+        assert_access()
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        form = self.browser.get_form('formDeleteUsers')
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['test_participant']
+        self.browser.submit()
+        self.browser_do_logout()
+        assert_no_access()
+ 
 def test_suite():
     suite = TestSuite()
     suite.addTest(makeSuite(NyMeetingCreateTestCase))
     suite.addTest(makeSuite(NyMeetingEditingTestCase))
     suite.addTest(makeSuite(NyMeetingFunctionalTestCase))
+    suite.addTest(makeSuite(NyMeetingParticipantsTestCase))
     return suite
 
