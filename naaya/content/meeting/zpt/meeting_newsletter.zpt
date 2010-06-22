@@ -1,0 +1,11 @@
+<metal:block define-macro="page" extend-macro="here/standard_template_macro">
+    <metal:block metal:fill-slot="title">
+        <title tal:content="string:${here/title} | ${here/site_title}" />
+    </metal:block>
+
+    <metal:block fill-slot="body">
+    
+    </metal:block>
+
+</metal:block>
+
