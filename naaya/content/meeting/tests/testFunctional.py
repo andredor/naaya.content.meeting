@@ -30,7 +30,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         import transaction; transaction.commit()
 
     def test_add(self):
-        self.browser_do_login('contributor', 'contributor')
+        self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/myfolder/meeting_add_html')
         self.assertTrue('<h1>Submit Meeting</h1>' in self.browser.get_html())
 
@@ -52,7 +52,6 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         form['contact_person:utf8:ustring'] = 'My Name'
         form['contact_email:utf8:ustring'] = 'my.email@my.domain'
         self.browser.submit()
-        self.assertTrue('The administrator will analyze your request and you will be notified about the result shortly.' in self.browser.get_html())
         self.assertTrue(hasattr(self.portal.myfolder, 'mymeeting'))
 
         self.portal.myfolder.mymeeting.approveThis()
@@ -64,13 +63,13 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         self.assertTrue('mailto:my.email@my.domain' in html)
         self.assertTrue('http://localhost/portal/myfolder/mymeeting/get_ics' in html)
         self.assertTrue('16/06/2010' in html)
-        self.assertTrue('contributor' in html)
+        self.assertTrue('admin' in html)
         self.assertTrue('Kogens Nytorv 6, 1050 Copenhagen K, Denmark' in html)
 
         self.browser_do_logout()
 
     def test_add_error(self):
-        self.browser_do_login('contributor', 'contributor')
+        self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/myfolder/meeting_add_html')
         form = self.browser.get_form('frmAdd')
         self.browser.clicked(form, self.browser.get_form_field(form, 'title'))
@@ -247,9 +246,12 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
             contact_person='My Name', contact_email='my.email@my.domain')
         self.portal.info.mymeeting.approveThis()
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
+        addPortalMeetingParticipant(self.portal)
+        self.portal.info.mymeeting.participants._add_user('test_participant')
         import transaction; transaction.commit()
 
     def beforeTearDown(self):
+        removePortalMeetingParticipant(self.portal)
         self.portal.info.manage_delObjects(['mymeeting'])
         self.portal.manage_uninstall_pluggableitem('Naaya Meeting')
         import transaction; transaction.commit()
@@ -257,6 +259,7 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
     def test_index(self):
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
 
+        self.browser_do_login('test_participant', 'participant')
         self.browser.go('http://localhost/portal/info/mymeeting')
         html = self.browser.get_html()
         self.assertTrue('MyMeeting' in html)
@@ -268,15 +271,20 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
         self.assertTrue('contributor' in html)
         self.assertTrue('Kogens Nytorv 6, 1050 Copenhagen K, Denmark' in html)
 
+        self.browser_do_logout()
+
     def test_feed(self):
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
 
+        self.browser_do_login('test_participant', 'participant')
         self.browser.go('http://localhost/portal/portal_syndication/latestuploads_rdf')
         html = self.browser.get_html()
         self.assertTrue('MyMeeting' in html)
         self.assertTrue('http://localhost/portal/info/mymeeting' in html)
         self.assertTrue('Kogens Nytorv 6, 1050 Copenhagen K, Denmark' in html)
         self.assertTrue('My Name' in html)
+
+        self.browser_do_logout()
 
     def test_search_for_new_participants(self):
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
@@ -318,7 +326,6 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
 
         addPortalMeetingParticipant(self.portal)
-        self.portal.info.mymeeting.setRestrictions(access='other', roles=[PARTICIPANT_ROLE])
         import transaction; transaction.commit()
 
     def beforeTearDown(self):

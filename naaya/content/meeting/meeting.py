@@ -147,6 +147,7 @@ def addNyMeeting(self, id='', REQUEST=None, contributor=None, **kwargs):
         approved, approved_by = 0, None
     ob.approveThis(approved, approved_by)
     ob.submitThis()
+    ob.setRestrictions(access='other', roles=[PARTICIPANT_ROLE])
 
     if ob.discussion: ob.open_for_comments()
     self.recatalogNyObject(ob)
