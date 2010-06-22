@@ -4,6 +4,19 @@
     </metal:block>
 
     <metal:block fill-slot="body">
+    <h1>
+        <img tal:attributes="src python:test(here.approved, here.icon, here.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
+        <tal:block tal:replace="here/title_or_id" /> - <span i18n:translate="manage participants"></span>
+    </h1>
+
+    <div class="floated-buttons">
+        <span class="buttons">
+            <a tal:attributes="href here/absolute_url" i18n:translate="Back to index"></a>
+        </span>
+    </div>
+
+    <p i18n:translate="This page lists the meeting participants and lets search for and add new participants or to remove existing participants."></p>
+
     <fieldset>
         <legend i18n:translate="Search and Add Users"></legend>
         <p i18n:translate="Use this form to find users and assign them to the meeting."></p>
