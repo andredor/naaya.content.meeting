@@ -14,15 +14,14 @@ from persistent.list import PersistentList
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.content.meeting import MEETING_ROLE
 
-class NyParticipants(SimpleItem):
+class Participants(SimpleItem):
     security = ClassSecurityInfo()
 
     title = "Edit participants"
 
-    def __init__(self, id, meeting):
+    def __init__(self, id):
         """ """
         self.id = id
-        self.meeting = meeting
         self.uids = PersistentList()
 
     def findUsers(self, search_param, search_term):
@@ -63,7 +62,7 @@ class NyParticipants(SimpleItem):
         return ret
 
     def _add_user(self, uid):
-        self.meeting.manage_setLocalRoles(uid, MEETING_ROLE)
+        self.aq_parent.manage_setLocalRoles(uid, MEETING_ROLE)
         self.uids.append(uid)
 
     def addUsers(self, REQUEST):
@@ -78,7 +77,7 @@ class NyParticipants(SimpleItem):
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
     def _remove_user(self, uid):
-        self.meeting.manage_delLocalRoles([uid])
+        self.aq_parent.manage_delLocalRoles([uid])
         self.uids.remove(uid)
 
     def removeUsers(self, REQUEST):

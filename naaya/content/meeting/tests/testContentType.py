@@ -3,8 +3,8 @@
 # Andrei Laza, Eau de Web
 
 from unittest import TestSuite, makeSuite
-from naaya.content.meeting.meeting_item import addNyMeeting as addNaayaContent
-from naaya.content.meeting.meeting_item import NyMeeting as NaayaContent
+from naaya.content.meeting.meeting import addNyMeeting as addNaayaContent
+from naaya.content.meeting.meeting import NyMeeting as NaayaContent
 from Products.Naaya.tests import NaayaTestCase
 
 class NaayaContentTestCase(NaayaTestCase.NaayaTestCase):

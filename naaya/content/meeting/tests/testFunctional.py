@@ -125,7 +125,7 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
 
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
-        from naaya.content.meeting.meeting_item import addNyMeeting
+        from naaya.content.meeting.meeting import addNyMeeting
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
             title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
@@ -240,7 +240,7 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
 
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
-        from naaya.content.meeting.meeting_item import addNyMeeting
+        from naaya.content.meeting.meeting import addNyMeeting
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
             title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
@@ -283,9 +283,9 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
 
         self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/info/mymeeting')
-        self.assertTrue('http://localhost/portal/info/mymeeting/edit_participants' in self.browser.get_html())
+        self.assertTrue('http://localhost/portal/info/mymeeting/participants' in self.browser.get_html())
 
-        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formSearchUsers')
         expected_controls = set(['search_param', 'search_term:utf8:ustring', 'search_user'])
         found_controls = set(c.name for c in form.controls)
@@ -309,7 +309,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
 
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
-        from naaya.content.meeting.meeting_item import addNyMeeting
+        from naaya.content.meeting.meeting import addNyMeeting
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
             title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
@@ -332,7 +332,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
 
         self.browser_do_login('admin', '')
-        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formSearchUsers')
         self.assertTrue('test_participant' not in self.browser.get_html())
 
@@ -380,13 +380,13 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
 
         self.browser_do_login('admin', '')
-        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
         self.assertTrue('test_participant' not in self.browser.get_html())
         self.browser_do_logout()
         assert_no_access()
 
         self.browser_do_login('admin', '')
-        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formSearchUsers')
         self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
         form['search_term:utf8:ustring'] = 'test_participant'
@@ -399,7 +399,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         assert_access()
 
         self.browser_do_login('admin', '')
-        self.browser.go('http://localhost/portal/info/mymeeting/edit_participants')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formDeleteUsers')
         self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
         form['uid'] = ['test_participant']

@@ -30,14 +30,14 @@ from Products.NaayaBase.constants import *
 from Products.NaayaBase.NyItem import NyItem
 from Products.NaayaBase.NyAttributes import NyAttributes
 from Products.NaayaBase.NyValidation import NyValidation
-from Products.NaayaBase.NyCheckControl import NyCheckControl
+from Products.NaayaBase.NyNonCheckControl import NyNonCheckControl
 from Products.NaayaBase.NyContentType import NyContentData
 from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
 from naaya.content.meeting import MEETING_ROLE
-from NyParticipants import NyParticipants
+from participants import Participants
 
 #module constants
 DEFAULT_SCHEMA = {
@@ -54,7 +54,7 @@ DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
 # this dictionary is updated at the end of the module
 config = {
         'product': 'NaayaContent',
-        'module': 'meeting_item',
+        'module': 'meeting',
         'package_path': os.path.abspath(os.path.dirname(__file__)),
         'meta_type': 'Naaya Meeting',
         'label': 'Meeting',
@@ -77,20 +77,18 @@ config = {
 
 def meeting_on_install(parent):
     """ """
-    role = MEETING_ROLE 
-    grouppermissions = ['Add comments']
+    grouppermissions = ['Browse content', 'Add comments']
     permissions = ['Naaya - Skip Captcha']
 
     auth_tool = parent.getAuthenticationTool()
-    try:
-        auth_tool.addRole(role, grouppermissions)
-    except:
-        zLOG.LOG('naaya.content.meeting', zLOG.WARNING, '%s role already in the site.' % role)
 
-    auth_tool.editRole(role, grouppermissions)
-    b = [x['name'] for x in parent.permissionsOfRole(role) if x['selected']=='SELECTED']
+    if MEETING_ROLE not in auth_tool.list_all_roles(): 
+        auth_tool.addRole(MEETING_ROLE, grouppermissions)
+
+    auth_tool.editRole(MEETING_ROLE, grouppermissions)
+    b = [x['name'] for x in parent.permissionsOfRole(MEETING_ROLE) if x['selected']=='SELECTED']
     b.extend(permissions)
-    parent.manage_role(role, b)
+    parent.manage_role(MEETING_ROLE, b)
     
 def meeting_add_html(self, REQUEST=None, RESPONSE=None):
     """ """
@@ -203,10 +201,7 @@ def importNyMeeting(self, param, id, attrs, content, properties, discussion, obj
             ob.import_comments(discussion)
             self.recatalogNyObject(ob)
 
-class meeting_item(Implicit, NyContentData):
-    """ """
-
-class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, NyContentType):
+class NyMeeting(Implicit, NyContentData, NyFolder, NyAttributes, NyItem, NyNonCheckControl, NyContentType):
     """ """
 
     implements(INyMeeting)
@@ -225,11 +220,9 @@ class NyMeeting(meeting_item, NyFolder, NyAttributes, NyItem, NyCheckControl, Ny
     def __init__(self, id, contributor):
         """ """
         self.id = id
-        meeting_item.__init__(self)
-        NyCheckControl.__dict__['__init__'](self)
         NyItem.__dict__['__init__'](self)
         self.contributor = contributor
-        self.edit_participants = NyParticipants('edit_participants', self)
+        self.participants = Participants('participants')
 
     security.declarePrivate('objectkeywords')
     def objectkeywords(self, lang):
