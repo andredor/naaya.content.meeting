@@ -22,21 +22,21 @@
             <h1 tal:define="path python:here.absolute_url(1);">
                 <a class="b_download" tal:condition="here/showBulkDownloadButton|nothing"
                         tal:attributes="href string:${here/absolute_url}/zip_download_html?path=${path}">
-                    <span i18n:translate="">Bulk download</span>
+                    <span i18n:translate="Bulk download"></span>
                 </a>
                 <img tal:attributes="
                     src python:test(here.approved, here.icon, here.icon_marked);
                     title here/get_meta_label;
                     alt here/get_meta_label" />
                 <tal:block tal:replace="here/title_or_id" />
-                <tal:block tal:condition="python: here.can_be_seen() and here.has_restrictions()" i18n:translate="">
-                    [Limited access]
+                <tal:block tal:condition="python: here.can_be_seen() and here.has_restrictions()">
+                    [<tal:block i18n:translate="Limited access"/>]
                 </tal:block>
                 <tal:block tal:condition="python:not here.can_be_seen()" i18n:translate="">
-                    [Restricted access]
+                    [<tal:block i18n:translate="Restricted access"/>]
                 </tal:block>
                 <span class="available_langs" tal:condition="python:here.item_has_title(here, here.title)">
-                    <span i18n:translate="">Item only translated in </span>
+                    <span i18n:translate="Item only translated in"></span>
                     <span tal:repeat="lang here/gl_get_languages_map">
                         <a tal:content="python:' %s' % lang['title']"
                             tal:condition="python:not lang['selected'] and here.getLocalProperty('title', lang['id'])"
@@ -50,11 +50,11 @@
             <tal:block content="structure python:here.portal_map.render_object_map(here.geo_location)"/>
 
             <p><a tal:attributes="href string:${here/absolute_url}/get_ics"
-                  i18n:translate="">Download as iCalendar</a></p>
+                  i18n:translate="Download as iCalendar"></a></p>
 
             <table border="0" cellspacing="2" cellpadding="2" tal:define="portal_map here/getGeoMapTool;">
             <tr tal:condition="here/start_date">
-                <th i18n:translate="">Period</th>
+                <th i18n:translate="Period"></th>
                 <td>
                 <tal:block condition="python:here.start_date != here.end_date">
                     [<span tal:replace="python:here.utShowDateTime(here.start_date)"/> - <span tal:replace="python:here.utShowDateTime(here.end_date)"/>]
@@ -76,7 +76,7 @@
                 <th style="vertical-align: top" i18n:translate="" tal:content="contact_person/label" />
                 <td>
                     <a tal:attributes="href python:'mailto:'+here.contact_email"
-                        tal:content="here/contact_person"/>
+                        tal:content="here/contact_person"></a>
                 </td>
             </tr>
             <tal:block content="structure python: here.prop_display_tr('releasedate')" />
@@ -85,7 +85,7 @@
             <tr tal:define="title python:portal_map.getSymbolTitle(here.geo_type);
             picture python:portal_map.getSymbolPicture(here.geo_type)"
                 tal:condition="python: title != '' and here.geo_location">
-                    <th i18n:translate="">Type</th>
+                    <th i18n:translate="Type"></th>
                     <td>
                 <img tal:condition="picture" tal:attributes="src string:${portal_map/absolute_url}/getSymbolZPicture?id=${here/geo_type}; alt title; title title" />
                 <span tal:replace="title" />
@@ -95,6 +95,10 @@
             <tal:block content="structure python: here.prop_display_tr('keywords')" />
 
             </table>
+            <p>
+                <a tal:condition="here/agenda_url" tal:attributes="href here/agenda_url" i18n:translate="Agenda"></a>
+                <a tal:condition="here/minutes_url" tal:attributes="href here/minutes_url" i18n:translate="Minutes"></a>
+            </p>
 
             <table border="0" cellspacing="2" cellpadding="2">
                 <tr tal:repeat="record python:here.getDynamicPropertiesTool().getDynamicProperties(here.meta_type)">
@@ -105,6 +109,9 @@
 
             <p tal:condition="python:here.description!=''"
                 tal:content="structure here/description" />
+
+            <!-- Make sure the folder listing is displayed after the map -->
+            <div style="clear: both"></div>
 
             <span tal:replace="structure here/menusubmissions" />
 
