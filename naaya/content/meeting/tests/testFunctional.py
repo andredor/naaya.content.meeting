@@ -5,7 +5,7 @@ from unittest import TestSuite, makeSuite
 
 from Products.Naaya.tests.NaayaFunctionalTestCase import NaayaFunctionalTestCase
 
-from naaya.content.meeting import MEETING_ROLE
+from naaya.content.meeting import PARTICIPANT_ROLE
 
 def addPortalMeetingParticipant(portal):
     portal.acl_users._doAddUser('test_participant', 'participant', [], '', '', '', '')
@@ -318,7 +318,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
 
         addPortalMeetingParticipant(self.portal)
-        self.portal.info.mymeeting.setRestrictions(access='other', roles=[MEETING_ROLE])
+        self.portal.info.mymeeting.setRestrictions(access='other', roles=[PARTICIPANT_ROLE])
         import transaction; transaction.commit()
 
     def beforeTearDown(self):
@@ -329,7 +329,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
 
     def test_add_participants(self):
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
-        self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+        self.assertTrue(PARTICIPANT_ROLE in self.portal.getAuthenticationTool().list_all_roles())
 
         self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/info/mymeeting/participants')
@@ -377,7 +377,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
             self.browser_do_logout()
 
         self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
-        self.assertTrue(MEETING_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+        self.assertTrue(PARTICIPANT_ROLE in self.portal.getAuthenticationTool().list_all_roles())
 
         self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/info/mymeeting/participants')

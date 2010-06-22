@@ -15,7 +15,6 @@ from App.ImageFile import ImageFile
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view_management_screens, view
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Acquisition import Implicit
 from zope.event import notify
 from naaya.content.base.events import NyContentObjectAddEvent
 from naaya.content.base.events import NyContentObjectEditEvent
@@ -27,16 +26,13 @@ from Products.Naaya.NyFolder import NyFolder
 from Products.NaayaBase.NyContentType import NyContentType, NY_CONTENT_BASE_SCHEMA
 from naaya.content.base.constants import *
 from Products.NaayaBase.constants import *
-from Products.NaayaBase.NyItem import NyItem
-from Products.NaayaBase.NyAttributes import NyAttributes
 from Products.NaayaBase.NyValidation import NyValidation
-from Products.NaayaBase.NyNonCheckControl import NyNonCheckControl
 from Products.NaayaBase.NyContentType import NyContentData
 from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
-from naaya.content.meeting import MEETING_ROLE
+from naaya.content.meeting import PARTICIPANT_ROLE
 from participants import Participants
 
 #module constants
@@ -75,22 +71,26 @@ config = {
 
 
 
-def meeting_on_install(parent):
-    """ """
+def meeting_on_install(site):
+    """
+    !!! Adding PARTICIPANT_ROLE on meeting installation.
+    This is given to the participants of the meetings.
+    Permissions are set similar to the Authenticated role.
+    """
     grouppermissions = ['Browse content', 'Add comments']
     permissions = ['Naaya - Skip Captcha']
 
-    auth_tool = parent.getAuthenticationTool()
+    auth_tool = site.getAuthenticationTool()
 
-    if MEETING_ROLE not in auth_tool.list_all_roles(): 
-        auth_tool.addRole(MEETING_ROLE, grouppermissions)
+    if PARTICIPANT_ROLE not in auth_tool.list_all_roles(): 
+        auth_tool.addRole(PARTICIPANT_ROLE, grouppermissions)
 
-    auth_tool.editRole(MEETING_ROLE, grouppermissions)
-    b = [x['name'] for x in parent.permissionsOfRole(MEETING_ROLE) if x['selected']=='SELECTED']
+    auth_tool.editRole(PARTICIPANT_ROLE, grouppermissions)
+    b = [x['name'] for x in site.permissionsOfRole(PARTICIPANT_ROLE) if x['selected']=='SELECTED']
     b.extend(permissions)
-    parent.manage_role(MEETING_ROLE, b)
+    site.manage_role(PARTICIPANT_ROLE, b)
     
-def meeting_add_html(self, REQUEST=None, RESPONSE=None):
+def meeting_add_html(self):
     """ """
     from Products.NaayaBase.NyContentType import get_schema_helper_for_metatype
     form_helper = get_schema_helper_for_metatype(self, config['meta_type'])
@@ -166,42 +166,7 @@ def addNyMeeting(self, id='', REQUEST=None, contributor=None, **kwargs):
 
     return ob.getId()
 
-def importNyMeeting(self, param, id, attrs, content, properties, discussion, objects):
-    #this method is called during the import process
-    try: param = abs(int(param))
-    except: param = 0
-    if param == 3:
-        #just try to delete the object
-        try: self.manage_delObjects([id])
-        except: pass
-    else:
-        ob = self._getOb(id, None)
-        if param in [0, 1] or (param==2 and ob is None):
-            if param == 1:
-                #delete the object if exists
-                try: self.manage_delObjects([id])
-                except: pass
-
-            ob = _create_NyMeeting_object(self, id, self.utEmptyToNone(attrs['contributor'].encode('utf-8')))
-            ob.sortorder = attrs['sortorder'].encode('utf-8')
-            ob.discussion = abs(int(attrs['discussion'].encode('utf-8')))
-            ob.start_date = self.utConvertDateTimeObjToString(self.utGetDate(attrs['start_date'].encode('utf-8')))
-            ob.end_date = self.utConvertDateTimeObjToString(self.utGetDate(attrs['end_date'].encode('utf-8')))
-            ob.agenda_url = attrs['agenda_url'].encode('utf-8')
-            ob.minutes_url = attrs['minutes_url'].encode('utf-8')
-            ob.contact_person = attrs['contact_person'].encode('utf-8')
-            ob.contact_email = attrs['contact_email'].encode('utf-8')
-
-            for property, langs in properties.items():
-                [ ob._setLocalPropValue(property, lang, langs[lang]) for lang in langs if langs[lang]!='' ]
-            ob.approveThis(approved=abs(int(attrs['approved'].encode('utf-8'))),
-                approved_by=self.utEmptyToNone(attrs['approved_by'].encode('utf-8')))
-            if attrs['releasedate'].encode('utf-8') != '':
-                ob.setReleaseDate(attrs['releasedate'].encode('utf-8'))
-            ob.import_comments(discussion)
-            self.recatalogNyObject(ob)
-
-class NyMeeting(Implicit, NyContentData, NyFolder, NyAttributes, NyItem, NyNonCheckControl, NyContentType):
+class NyMeeting(NyContentData, NyFolder):
     """ """
 
     implements(INyMeeting)
@@ -211,16 +176,11 @@ class NyMeeting(Implicit, NyContentData, NyFolder, NyAttributes, NyItem, NyNonCh
     icon = 'misc_/NaayaContent/NyMeeting.gif'
     icon_marked = 'misc_/NaayaContent/NyMeeting_marked.gif'
 
-    def manage_options(self):
-        """ """
-        return NyFolder.manage_options
-
     security = ClassSecurityInfo()
 
     def __init__(self, id, contributor):
         """ """
         self.id = id
-        NyItem.__dict__['__init__'](self)
         self.contributor = contributor
         self.participants = Participants('participants')
 
@@ -360,7 +320,7 @@ class NyMeeting(Implicit, NyContentData, NyFolder, NyAttributes, NyItem, NyNonCh
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_menusubmissions')
 
-    def get_ics(self, REQUEST, RESPONSE):
+    def get_ics(self, REQUEST=None):
         """ Export this meeting as 'ics' """
 
         cal = vobject.iCalendar()
@@ -389,11 +349,11 @@ class NyMeeting(Implicit, NyContentData, NyFolder, NyAttributes, NyItem, NyNonCh
 
         ics_data = cal.serialize()
 
-        #RESPONSE.setHeader('Content-Type', 'text/plain')
-        RESPONSE.setHeader('Content-Type', 'text/calendar')
-        RESPONSE.setHeader('Content-Disposition',
-                           'attachment;filename=%s.ics' % self.getId())
-        RESPONSE.write(ics_data)
+        if REQUEST is not None:
+            REQUEST.RESPONSE.setHeader('Content-Type', 'text/calendar')
+            REQUEST.RESPONSE.setHeader('Content-Disposition',
+                               'attachment;filename=%s.ics' % self.getId())
+            REQUEST.RESPONSE.write(ics_data)
 
 InitializeClass(NyMeeting)
 
@@ -412,7 +372,6 @@ config.update({
             ('manage_addNyMeeting', manage_addNyMeeting_html),
             ('meeting_add_html', meeting_add_html),
             ('addNyMeeting', addNyMeeting),
-            ('import_meeting_item', importNyMeeting),
         ],
     'add_method': addNyMeeting,
     'validation': issubclass(NyMeeting, NyValidation),

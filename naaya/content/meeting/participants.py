@@ -12,7 +12,7 @@ from persistent.list import PersistentList
 
 #Naaya imports
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
-from naaya.content.meeting import MEETING_ROLE
+from naaya.content.meeting import PARTICIPANT_ROLE
 
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
@@ -62,7 +62,7 @@ class Participants(SimpleItem):
         return ret
 
     def _add_user(self, uid):
-        self.aq_parent.manage_setLocalRoles(uid, MEETING_ROLE)
+        self.aq_parent.manage_setLocalRoles(uid, PARTICIPANT_ROLE)
         self.uids.append(uid)
 
     def addUsers(self, REQUEST):
