@@ -43,7 +43,7 @@ DEFAULT_SCHEMA = {
     'agenda_url':       dict(sortorder=210, widget_type='String',   label='Agenda URL'),
     'minutes_url':      dict(sortorder=210, widget_type='String',   label='Minutes URL'),
     'contact_person':   dict(sortorder=210, widget_type='String',   label='Contact person'),
-    'contact_email':    dict(sortorder=210, widget_type='String',   label='Contact email'),
+    'contact_email':    dict(sortorder=210, widget_type='String',   label='Contact email', required=True),
 }
 DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
 
@@ -324,10 +324,20 @@ class NyMeeting(NyContentData, NyFolder):
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_menusubmissions')
 
-    security.declareProtected(view, 'newsletter_html')
+    security.declareProtected(PERMISSION_EDIT_OBJECTS, 'newsletter_html')
     def newsletter_html(self, REQUEST=None, RESPONSE=None):
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_newsletter')
+
+    security.declareProtected(PERMISSION_EDIT_OBJECTS, 'send_newsletter')
+    def send_newsletter(self, REQUEST):
+        """ """
+        email_tool = self.getEmailTool()
+        participants_emails = []
+        email_tool.sendEmail(p_content=REQUEST.form['body_text'],
+                                p_to=participants_emails,
+                                p_from=self.contact_email,
+                                p_subject=REQUEST.form['subject'])
 
     def get_ics(self, REQUEST=None):
         """ Export this meeting as 'ics' """

@@ -86,11 +86,21 @@
                 <tr>
                     <th width="30px" i18n:translate="Select"></th>
                     <th i18n:translate="User ID"></th>
+                    <th i18n:translate="User Name"></th>
+                    <th i18n:translate="User Email"></th>
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
                     <td><input type="checkbox" name="uid" tal:attributes="value user"/></td>
                     <td><span tal:replace="user"/></td>
+                    <td tal:define="name python:here.getUserFullName(user)"
+                            tal:condition="name">
+                        <span tal:replace="name"/>
+                    </td>
+                    <td tal:define="email python:here.getUserEmail(user)"
+                            tal:condition="email">
+                        <span tal:replace="email"/>
+                    </td>
                 </tr>
             </table>
             <input type="submit" name="remove_users" value="Remove selected participants"/>

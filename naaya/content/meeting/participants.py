@@ -91,6 +91,32 @@ class Participants(SimpleItem):
                 self._remove_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
+    def getUserFullName(self, uid):
+        """ """
+        auth_tool = self.getAuthenticationTool()
+        local_user = auth_tool.getUser(uid)
+        if local_user is not None:
+            return auth_tool.getUserFullName(local_user) 
+
+        for source in auth_tool.getSources():
+            acl_folder = source.getUserFolder()
+            user = acl_folder.getUserById(uid, None)
+            if user is not None:
+                return user.getProperty('cn')
+
+    def getUserEmail(self, uid):
+        """ """
+        auth_tool = self.getAuthenticationTool()
+        local_user = auth_tool.getUser(uid)
+        if local_user is not None:
+            return auth_tool.getUserEmail(local_user) 
+
+        for source in auth_tool.getSources():
+            acl_folder = source.getUserFolder()
+            user = acl_folder.getUserById(uid, None)
+            if user is not None:
+                return user.getProperty('mail')
+
     security.declareProtected(change_permissions, 'index_html')
     def index_html(self, REQUEST):
         """ """
