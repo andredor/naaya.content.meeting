@@ -5,7 +5,7 @@
 
     <metal:block fill-slot="body">
     <h1>
-        <img tal:attributes="src python:test(here.approved, here.icon, here.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
+        <img tal:attributes="src python:test(here.aq_parent.approved, here.aq_parent.icon, here.aq_parent.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
         <tal:block tal:replace="here/title_or_id" />
     </h1>
 
@@ -86,20 +86,18 @@
                 <tr>
                     <th width="30px" i18n:translate="Select"></th>
                     <th i18n:translate="User ID"></th>
-                    <th i18n:translate="User Name"></th>
-                    <th i18n:translate="User Email"></th>
+                    <th i18n:translate="Name"></th>
+                    <th i18n:translate="Email"></th>
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
                     <td><input type="checkbox" name="uid" tal:attributes="value user"/></td>
                     <td><span tal:replace="user"/></td>
-                    <td tal:define="name python:here.getUserFullName(user)"
-                            tal:condition="name">
-                        <span tal:replace="name"/>
+                    <td tal:define="name python:here.getUserFullName(user)">
+                        <span tal:condition="name" tal:replace="name"/>
                     </td>
-                    <td tal:define="email python:here.getUserEmail(user)"
-                            tal:condition="email">
-                        <span tal:replace="email"/>
+                    <td tal:define="email python:here.getUserEmail(user)">
+                        <span tal:condition="email" tal:replace="email"/>
                     </td>
                 </tr>
             </table>

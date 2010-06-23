@@ -332,12 +332,15 @@ class NyMeeting(NyContentData, NyFolder):
     security.declareProtected(PERMISSION_EDIT_OBJECTS, 'send_newsletter')
     def send_newsletter(self, REQUEST):
         """ """
+        participants_emails = [self.participants.getUserEmail(uid) for uid in self.participants.uids]
+
         email_tool = self.getEmailTool()
-        participants_emails = []
         email_tool.sendEmail(p_content=REQUEST.form['body_text'],
                                 p_to=participants_emails,
                                 p_from=self.contact_email,
                                 p_subject=REQUEST.form['subject'])
+
+        REQUEST.RESPONSE.redirect(self.absolute_url())
 
     def get_ics(self, REQUEST=None):
         """ Export this meeting as 'ics' """

@@ -17,7 +17,7 @@ from naaya.content.meeting import PARTICIPANT_ROLE
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
 
-    title = "Participants"
+    title = "Meeting Participants"
 
     def __init__(self, id):
         """ """
@@ -62,6 +62,9 @@ class Participants(SimpleItem):
         return ret
 
     def _add_user(self, uid):
+        if uid in self.uids:
+            return
+
         self.aq_parent.manage_setLocalRoles(uid, PARTICIPANT_ROLE)
         self.uids.append(uid)
 
@@ -116,6 +119,22 @@ class Participants(SimpleItem):
             user = acl_folder.getUserById(uid, None)
             if user is not None:
                 return user.getProperty('mail')
+
+    def getUserOrganisation(self, uid):
+        """
+        !!! This is slow compared with getUserFullName and getUserEmail.
+        Use it only when necessary.
+        """
+        auth_tool = self.getAuthenticationTool()
+        local_user = auth_tool.getUser(uid)
+        if local_user is not None:
+            return ''
+
+        for source in auth_tool.getSources():
+            acl_folder = source.getUserFolder()
+            user = source._get_user_by_uid(uid, acl_folder)
+            if user is not None:
+                return source._get_user_organisation(user)
 
     security.declareProtected(change_permissions, 'index_html')
     def index_html(self, REQUEST):
