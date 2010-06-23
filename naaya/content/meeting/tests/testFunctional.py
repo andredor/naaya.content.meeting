@@ -312,6 +312,39 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
 
         self.browser_do_logout()
 
+    def test_newsletter_page(self):
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting')
+        self.assertTrue('http://localhost/portal/info/mymeeting/newsletter_html' in self.browser.get_html())
+
+        self.browser.go('http://localhost/portal/info/mymeeting/newsletter_html')
+        form = self.browser.get_form('formSendNewsletter')
+        expected_controls = set(['subject:utf8:ustring', 'body_text:utf8:ustring'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+
+        self.browser_do_logout()
+
+    def test_manage_options(self):
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/manage_main')
+        html = self.browser.get_html()
+        self.assertTrue('Naaya Meeting' in html)
+        self.assertTrue('Contents' in html)
+        self.assertTrue('View' in html)
+        self.assertTrue('Properties' in html)
+        self.assertTrue('Subobjects' in html)
+        self.assertTrue('Dynamic properties' in html)
+        self.assertTrue('Security' in html)
+        self.assertTrue('Undo' in html)
+
+        self.browser_do_logout()
+
 class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
     """ ParticipantsTestCase for NyMeeting object """
 
