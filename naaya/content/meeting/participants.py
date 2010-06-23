@@ -17,7 +17,7 @@ from naaya.content.meeting import PARTICIPANT_ROLE
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
 
-    title = "Edit participants"
+    title = "Participants"
 
     def __init__(self, id):
         """ """

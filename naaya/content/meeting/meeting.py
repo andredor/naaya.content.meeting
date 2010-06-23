@@ -177,12 +177,15 @@ class NyMeeting(NyContentData, NyFolder):
     icon = 'misc_/NaayaContent/NyMeeting.gif'
     icon_marked = 'misc_/NaayaContent/NyMeeting_marked.gif'
 
+    def manage_options(self):
+        """ """
+        return NyFolder.manage_options
+
     security = ClassSecurityInfo()
 
     def __init__(self, id, contributor):
         """ """
-        self.id = id
-        self.contributor = contributor
+        NyFolder.__dict__['__init__'](self, id, contributor)
         self.participants = Participants('participants')
 
     security.declarePrivate('objectkeywords')
