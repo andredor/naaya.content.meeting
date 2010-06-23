@@ -88,6 +88,7 @@
                     <th i18n:translate="User ID"></th>
                     <th i18n:translate="Name"></th>
                     <th i18n:translate="Email"></th>
+                    <th i18n:translate="Organisation"></th>
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
@@ -98,6 +99,9 @@
                     </td>
                     <td tal:define="email python:here.getUserEmail(user)">
                         <span tal:condition="email" tal:replace="email"/>
+                    </td>
+                    <td tal:define="organisation python:here.getUserOrganisation(user)">
+                        <span tal:condition="organisation" tal:replace="organisation"/>
                     </td>
                 </tr>
             </table>

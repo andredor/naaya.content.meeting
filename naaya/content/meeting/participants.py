@@ -121,10 +121,7 @@ class Participants(SimpleItem):
                 return user.getProperty('mail')
 
     def getUserOrganisation(self, uid):
-        """
-        !!! This is slow compared with getUserFullName and getUserEmail.
-        Use it only when necessary.
-        """
+        """ """
         auth_tool = self.getAuthenticationTool()
         local_user = auth_tool.getUser(uid)
         if local_user is not None:
@@ -132,9 +129,9 @@ class Participants(SimpleItem):
 
         for source in auth_tool.getSources():
             acl_folder = source.getUserFolder()
-            user = source._get_user_by_uid(uid, acl_folder)
+            user = acl_folder.getUserById(uid, None)
             if user is not None:
-                return source._get_user_organisation(user)
+                return user.getProperty('o')
 
     security.declareProtected(change_permissions, 'index_html')
     def index_html(self, REQUEST):
