@@ -27,8 +27,8 @@ class NaayaContentTestCase(NaayaTestCase.NaayaTestCase):
     def test_main(self):
         """ Add, Find, Edit and Delete Naaya Contact """
         #add Naaya Content
-        addNaayaContent(self._portal().info, title=self.doc_name_en, lang='en', start_date=self.doc_start_date)
-        addNaayaContent(self._portal().info, title=self.doc_name_fr, lang='fr', start_date=self.doc_start_date)
+        addNaayaContent(self._portal().info, title=self.doc_name_en, lang='en', start_date=self.doc_start_date, contact_email='email@email.com')
+        addNaayaContent(self._portal().info, title=self.doc_name_fr, lang='fr', start_date=self.doc_start_date, contact_email='email@email.com')
         
         meta = self._portal().getCatalogedObjectsCheckView(meta_type=[self.doc_meta_type,])
         
@@ -45,8 +45,8 @@ class NaayaContentTestCase(NaayaTestCase.NaayaTestCase):
         #Change content title
         title_en = self.doc_name_en + '_edited'
         title_fr = self.doc_name_fr + 'edited'
-        meta.saveProperties(title=title_en, lang='en', start_date=self.doc_start_date)
-        meta_fr.saveProperties(title=title_fr, lang='fr', start_date=self.doc_start_date)
+        meta.saveProperties(title=title_en, lang='en', start_date=self.doc_start_date, contact_email='email@email.com')
+        meta_fr.saveProperties(title=title_fr, lang='fr', start_date=self.doc_start_date, contact_email='email@email.com')
         
         self.assertEqual(meta.getLocalProperty('title', 'en'), title_en)
         self.assertEqual(meta_fr.getLocalProperty('title', 'fr'), title_fr)
