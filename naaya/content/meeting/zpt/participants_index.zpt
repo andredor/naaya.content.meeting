@@ -73,7 +73,7 @@
     </fieldset>
     <fieldset>
         <legend i18n:translate="List of participants"></legend>
-        <p i18n:translate="Use this form to view and remove participants."></p>
+        <p i18n:translate="Use this form to view and remove participants. You can also nominate one participant as administrator."></p>
         <tal:block define="sort_on python:request.get('sort_on', '');
                     users python:here.getParticipants(sort_on);">
 
@@ -82,6 +82,16 @@
         </tal:block>
 
         <tal:block condition="python:len(users)!=0">
+        <form method="post" action="setAdministrator" name="formSetAdministrator">
+            <label for="uid" i18n:translate="Select participant"></label>
+            <select id="uid" name="uid" tal:define="admin here/administrator_uid|nothing">
+                <option value="" i18n:translate="No administrator" tal:attributes="selected python:test(admin, False, True)"></option>
+                <option tal:repeat="user users" tal:content="user" tal:attributes="value user; selected python:admin==user"/>
+            </select>
+
+            <input type="submit" name="set_administrator" value="Set administrator"/>
+        </form>
+
         <form method="post" action="removeUsers" name="formDeleteUsers">
             <table class="datatable" width="95%">
                 <tr>

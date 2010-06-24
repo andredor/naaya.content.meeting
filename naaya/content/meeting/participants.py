@@ -24,6 +24,7 @@ class Participants(SimpleItem):
         """ """
         self.id = id
         self.uids = PersistentList()
+        self.administrator_uid = None
 
     def findUsers(self, search_param, search_term):
         """ """
@@ -66,7 +67,7 @@ class Participants(SimpleItem):
         if uid in self.uids:
             return
 
-        self.aq_parent.manage_setLocalRoles(uid, PARTICIPANT_ROLE)
+        self.aq_parent.manage_setLocalRoles(uid, [PARTICIPANT_ROLE])
         self.uids.append(uid)
 
     def addUsers(self, REQUEST):
@@ -94,6 +95,25 @@ class Participants(SimpleItem):
             else:
                 self._remove_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
+
+    security.declareProtected(change_permissions, 'setAdministrator')
+    def setAdministrator(self, uid, REQUEST=None):
+        """ """
+        old_admin = self.administrator_uid
+        if uid:
+            self.aq_parent.manage_delLocalRoles([uid])
+            self.aq_parent.manage_setLocalRoles(uid, ['Administrator'])
+            self.administrator_uid = uid
+        else:
+            self.administrator_uid = None
+
+        if old_admin:
+            self.aq_parent.manage_delLocalRoles([old_admin])
+            if old_admin in self.uids:
+                self.aq_parent.manage_setLocalRoles(old_admin, [PARTICIPANT_ROLE])
+
+        if REQUEST is not None:
+            REQUEST.RESPONSE.redirect(self.absolute_url())
 
     def getParticipants(self, sort_on=''):
         """ """

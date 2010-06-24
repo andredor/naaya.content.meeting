@@ -359,6 +359,56 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
         self.assertTrue('Meeting Reports' in html)
         self.assertTrue('jstree' in html)
 
+    def test_meeting_administrator(self):
+        def assert_participant_access():
+            self.browser_do_login('test_participant', 'participant')
+            self.browser.go('http://localhost/portal/info/mymeeting')
+            html = self.browser.get_html()
+            self.assertTrue('Access denied' not in html)
+            self.assertTrue('http://localhost/portal/info/mymeeting/participants' not in html)
+            self.browser_do_logout()
+        def assert_admin_access():
+            self.browser_do_login('test_participant', 'participant')
+            self.browser.go('http://localhost/portal/info/mymeeting')
+            html = self.browser.get_html()
+            self.assertTrue('Access denied' not in html)
+            self.assertTrue('http://localhost/portal/info/mymeeting/participants' in html)
+            self.browser_do_logout()
+
+
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+        self.assertTrue(PARTICIPANT_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
+        form = self.browser.get_form('formSetAdministrator')
+        expected_controls = set(['uid', 'set_administrator'])
+        found_controls = set(c.name for c in form.controls)
+        self.assertTrue(expected_controls <= found_controls,
+            'Missing form controls: %s' % repr(expected_controls - found_controls))
+
+        self.browser_do_logout()
+        assert_participant_access()
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
+        form = self.browser.get_form('formSetAdministrator')
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['test_participant']
+        self.browser.submit()
+        self.browser_do_logout()
+        assert_admin_access()
+
+        self.browser_do_login('admin', '')
+        self.browser.go('http://localhost/portal/info/mymeeting/participants')
+        form = self.browser.get_form('formSetAdministrator')
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
+        form['uid'] = ['']
+        self.browser.submit()
+        self.browser_do_logout()
+        assert_participant_access()
+
+
 class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
     """ ParticipantsTestCase for NyMeeting object """
 
