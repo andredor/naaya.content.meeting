@@ -74,7 +74,8 @@
     <fieldset>
         <legend i18n:translate="List of participants"></legend>
         <p i18n:translate="Use this form to view and remove participants."></p>
-        <tal:block define="users here/uids;">
+        <tal:block define="sort_on python:request.get('sort_on', '');
+                    users python:here.getParticipants(sort_on);">
 
         <tal:block condition="python:len(users)==0">
         <div i18n:translate="No participans."></div>
@@ -85,10 +86,26 @@
             <table class="datatable" width="95%">
                 <tr>
                     <th width="30px" i18n:translate="Select"></th>
-                    <th i18n:translate="User ID"></th>
-                    <th i18n:translate="Name"></th>
-                    <th i18n:translate="Email"></th>
-                    <th i18n:translate="Organisation"></th>
+                    <th>
+                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=uid"
+                             i18n:translate="User ID">
+                        </a>
+                    </th>
+                    <th>
+                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=name"
+                             i18n:translate="Name">
+                        </a>
+                    </th>
+                    <th>
+                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=email"
+                             i18n:translate="Email">
+                        </a>
+                    </th>
+                    <th>
+                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=o"
+                             i18n:translate="Organisation">
+                        </a>
+                    </th>
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">

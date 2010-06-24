@@ -94,6 +94,21 @@ class Participants(SimpleItem):
                 self._remove_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
+    def getParticipants(self, sort_on=''):
+        key = None
+        if sort_on == 'o':
+            key = lambda x: self.getUserOrganisation(x)
+        elif sort_on == 'name':
+            key = lambda x: self.getUserFullName(x)
+        elif sort_on == 'email':
+            key = lambda x: self.getUserEmail(x)
+        elif sort_on == 'uid':
+            key = lambda x: x
+
+        if key is None:
+            return self.uids
+        return sorted(self.uids, key=key)
+
     def _encode(self, val):
         return unicode(val, 'iso-8859-1').encode('utf-8')
 
