@@ -13,6 +13,7 @@ from persistent.list import PersistentList
 #Naaya imports
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.content.meeting import PARTICIPANT_ROLE
+from utils import getUserFullName, getUserEmail, getUserOrganisation
 
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
@@ -95,13 +96,15 @@ class Participants(SimpleItem):
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
     def getParticipants(self, sort_on=''):
+        """ """
+        site = self.getSite()
         key = None
         if sort_on == 'o':
-            key = lambda x: self.getUserOrganisation(x)
+            key = lambda x: getUserOrganisation(site, x)
         elif sort_on == 'name':
-            key = lambda x: self.getUserFullName(x)
+            key = lambda x: getUserFullName(site, x)
         elif sort_on == 'email':
-            key = lambda x: self.getUserEmail(x)
+            key = lambda x: getUserEmail(site, x)
         elif sort_on == 'uid':
             key = lambda x: x
 
@@ -109,49 +112,13 @@ class Participants(SimpleItem):
             return self.uids
         return sorted(self.uids, key=key)
 
-    def _encode(self, val):
-        return unicode(val, 'iso-8859-1').encode('utf-8')
-
-    def getUserFullName(self, uid):
+    def getParticipantInfo(self, uid):
         """ """
-        auth_tool = self.getAuthenticationTool()
-        local_user = auth_tool.getUser(uid)
-        if local_user is not None:
-            username = auth_tool.getUserFullName(local_user)
-            return self._encode(username)
-
-        for source in auth_tool.getSources():
-            acl_folder = source.getUserFolder()
-            user = acl_folder.getUserById(uid, None)
-            if user is not None:
-                return self._encode(user.getProperty('cn'))
-
-    def getUserEmail(self, uid):
-        """ """
-        auth_tool = self.getAuthenticationTool()
-        local_user = auth_tool.getUser(uid)
-        if local_user is not None:
-            return auth_tool.getUserEmail(local_user)
-
-        for source in auth_tool.getSources():
-            acl_folder = source.getUserFolder()
-            user = acl_folder.getUserById(uid, None)
-            if user is not None:
-                return self._encode(user.getProperty('mail'))
-
-    def getUserOrganisation(self, uid):
-        """ """
-        auth_tool = self.getAuthenticationTool()
-        local_user = auth_tool.getUser(uid)
-        if local_user is not None:
-            return ''
-
-        for source in auth_tool.getSources():
-            acl_folder = source.getUserFolder()
-            user = acl_folder.getUserById(uid, None)
-            if user is not None:
-                return self._encode(user.getProperty('o'))
-
+        site = self.getSite()
+        name = getUserFullName(site, uid)
+        email = getUserEmail(site, uid)
+        organisation = getUserOrganisation(site, uid)
+        return {'uid': uid, 'name': name, 'email': email, 'organisation': organisation}
 
     security.declareProtected(change_permissions, 'index_html')
     def index_html(self, REQUEST):

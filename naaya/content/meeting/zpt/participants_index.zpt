@@ -109,17 +109,19 @@
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
-                    <td><input type="checkbox" name="uid" tal:attributes="value user"/></td>
+                    <tal:block define="user_info python:here.getParticipantInfo(user)">
+                    <td><input type="checkbox" name="uid" tal:attributes="value user_info/uid"/></td>
                     <td><span tal:replace="user"/></td>
-                    <td tal:define="name python:here.getUserFullName(user)">
+                    <td tal:define="name user_info/name">
                         <span tal:condition="name" tal:replace="name"/>
                     </td>
-                    <td tal:define="email python:here.getUserEmail(user)">
+                    <td tal:define="email user_info/email">
                         <span tal:condition="email" tal:replace="email"/>
                     </td>
-                    <td tal:define="organisation python:here.getUserOrganisation(user)">
+                    <td tal:define="organisation user_info/organisation">
                         <span tal:condition="organisation" tal:replace="organisation"/>
                     </td>
+                    </tal:block>
                 </tr>
             </table>
             <input type="submit" name="remove_users" value="Remove selected participants"/>

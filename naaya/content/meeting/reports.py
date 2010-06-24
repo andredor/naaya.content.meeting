@@ -17,6 +17,7 @@ from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 
 #naaya.content.meeting improts
 import meeting as meeting_module
+from utils import getUserFullName, getUserEmail, getUserOrganisation
 
 class MeetingReports(SimpleItem):
     """ """
@@ -28,17 +29,12 @@ class MeetingReports(SimpleItem):
         """ """
         self.id = id
 
-    def _get_info_tool(self, meeting_obs):
-        if len(meeting_obs) > 0:
-            return meeting_obs[0].participants
-
     def jstree_participants(self):
         """ """
         jstree, participants = [], {}
         site = self.getSite()
         meeting_config = meeting_module.get_config()
         meeting_obs = site.getCatalogedObjectsCheckView(meta_type=meeting_config['meta_type'], approved=1)
-        info_tool = self._get_info_tool(meeting_obs)
 
         for meeting_ob in meeting_obs:
             for uid in meeting_ob.participants.uids:
@@ -59,7 +55,7 @@ class MeetingReports(SimpleItem):
                                                      {'href': href}
                                     }})
 
-            name = info_tool.getUserFullName(uid)
+            name = getUserFullName(site, uid)
             icon = 'images/report_icons/participant.gif'
             user_node = {'data':
                                 {'title': name,
@@ -68,7 +64,7 @@ class MeetingReports(SimpleItem):
                                     {'href': ''}
                                 },
                             'children': meeting_nodes}
-            email = info_tool.getUserEmail(uid)
+            email = getUserEmail(site, uid)
             if email is not None:
                 href = 'mailto:' + email
                 user_node['data']['attributes'] = {'href': href}
@@ -82,11 +78,10 @@ class MeetingReports(SimpleItem):
         site = self.getSite()
         meeting_config = meeting_module.get_config()
         meeting_obs = site.getCatalogedObjectsCheckView(meta_type=meeting_config['meta_type'], approved=1)
-        info_tool = self._get_info_tool(meeting_obs)
 
         for meeting in meeting_obs:
             for uid in meeting.participants.uids:
-                organisation = info_tool.getUserOrganisation(uid)
+                organisation = getUserOrganisation(site, uid)
                 if organisation not in organisations:
                     organisations[organisation] = {}
                 if uid not in organisations[organisation]:
@@ -107,7 +102,7 @@ class MeetingReports(SimpleItem):
                                                  'attributes':
                                                          {'href': href}
                                         }})
-                name = info_tool.getUserFullName(uid)
+                name = getUserFullName(site, uid)
                 icon = 'images/report_icons/participant.gif'
                 user_node = {'data':
                                     {'title': name,
@@ -116,7 +111,7 @@ class MeetingReports(SimpleItem):
                                         {'href': ''}
                                     },
                                 'children': meeting_nodes}
-                email = info_tool.getUserEmail(uid)
+                email = getUserEmail(site, uid)
                 if email is not None:
                     href = 'mailto:' + email
                     user_node['data']['attributes'] = {'href': href}
