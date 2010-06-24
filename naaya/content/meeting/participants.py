@@ -94,31 +94,35 @@ class Participants(SimpleItem):
                 self._remove_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
+    def _encode(self, val):
+        return unicode(val, 'iso-8859-1').encode('utf-8')
+
     def getUserFullName(self, uid):
         """ """
         auth_tool = self.getAuthenticationTool()
         local_user = auth_tool.getUser(uid)
         if local_user is not None:
-            return auth_tool.getUserFullName(local_user) 
+            username = auth_tool.getUserFullName(local_user)
+            return self._encode(username)
 
         for source in auth_tool.getSources():
             acl_folder = source.getUserFolder()
             user = acl_folder.getUserById(uid, None)
             if user is not None:
-                return user.getProperty('cn')
+                return self._encode(user.getProperty('cn'))
 
     def getUserEmail(self, uid):
         """ """
         auth_tool = self.getAuthenticationTool()
         local_user = auth_tool.getUser(uid)
         if local_user is not None:
-            return auth_tool.getUserEmail(local_user) 
+            return auth_tool.getUserEmail(local_user)
 
         for source in auth_tool.getSources():
             acl_folder = source.getUserFolder()
             user = acl_folder.getUserById(uid, None)
             if user is not None:
-                return user.getProperty('mail')
+                return self._encode(user.getProperty('mail'))
 
     def getUserOrganisation(self, uid):
         """ """
@@ -131,7 +135,8 @@ class Participants(SimpleItem):
             acl_folder = source.getUserFolder()
             user = acl_folder.getUserById(uid, None)
             if user is not None:
-                return user.getProperty('o')
+                return self._encode(user.getProperty('o'))
+
 
     security.declareProtected(change_permissions, 'index_html')
     def index_html(self, REQUEST):

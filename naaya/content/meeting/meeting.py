@@ -6,7 +6,6 @@ from copy import deepcopy
 import os
 import sys
 import datetime
-
 import vobject
 
 #Zope imports
@@ -21,7 +20,7 @@ from naaya.content.base.events import NyContentObjectEditEvent
 from zope.interface import implements
 import zLOG
 
-#Product imports
+#Naaya imports
 from Products.Naaya.NyFolder import NyFolder
 from Products.NaayaBase.NyContentType import NyContentType, NY_CONTENT_BASE_SCHEMA
 from naaya.content.base.constants import *
@@ -32,8 +31,11 @@ from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
+
+#Meeting imports
 from naaya.content.meeting import PARTICIPANT_ROLE
 from participants import Participants
+from reports import MeetingReports
 
 #module constants
 DEFAULT_SCHEMA = {
@@ -89,6 +91,8 @@ def meeting_on_install(site):
     b = [x['name'] for x in site.permissionsOfRole(PARTICIPANT_ROLE) if x['selected']=='SELECTED']
     b.extend(permissions)
     site.manage_role(PARTICIPANT_ROLE, b)
+
+    site.meeting_reports = MeetingReports('meeting_reports')
     
 def meeting_add_html(self):
     """ """

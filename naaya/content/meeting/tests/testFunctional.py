@@ -345,6 +345,20 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
 
         self.browser_do_logout()
 
+    def test_reports(self):
+        self.assertTrue(hasattr(self.portal.info, 'mymeeting'))
+        self.assertTrue(PARTICIPANT_ROLE in self.portal.getAuthenticationTool().list_all_roles())
+
+        self.browser.go('http://localhost/portal/meeting_reports/report_meeting_participants')
+        html = self.browser.get_html()
+        self.assertTrue('Meeting Reports' in html)
+        self.assertTrue('jstree' in html)
+
+        self.browser.go('http://localhost/portal/meeting_reports/report_meeting_organisations')
+        html = self.browser.get_html()
+        self.assertTrue('Meeting Reports' in html)
+        self.assertTrue('jstree' in html)
+
 class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
     """ ParticipantsTestCase for NyMeeting object """
 
@@ -446,7 +460,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.browser.submit()
         self.browser_do_logout()
         assert_no_access()
- 
+
 def test_suite():
     suite = TestSuite()
     suite.addTest(makeSuite(NyMeetingCreateTestCase))
