@@ -1,10 +1,18 @@
 # Authors:
 # Andrei Laza, Eau de Web
 
+#Python imports
 from unittest import TestSuite, makeSuite
 
-from Products.Naaya.tests.NaayaFunctionalTestCase import NaayaFunctionalTestCase
+#Zope imports
+from Testing import ZopeTestCase
 
+#Naaya imports
+from Products.Naaya.tests.NaayaFunctionalTestCase import NaayaFunctionalTestCase
+from Products.NaayaSurvey.SurveyTool import manage_addSurveyTool, SurveyTool
+from Products.NaayaSurvey.MegaSurvey import manage_addMegaSurvey
+
+#Meeting imports
 from naaya.content.meeting import PARTICIPANT_ROLE
 
 def addPortalMeetingParticipant(portal):
@@ -511,11 +519,65 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.browser_do_logout()
         assert_no_access()
 
+ZopeTestCase.installProduct('NaayaWidgets')
+ZopeTestCase.installProduct('NaayaSurvey')
+
+class NyMeetingSurveyTestCase(NaayaFunctionalTestCase):
+    """ SurveyTestCase for NyMeeting object """
+
+    def afterSetUp(self):
+        self.portal.manage_install_pluggableitem('Naaya Meeting')
+        from naaya.content.meeting.meeting import addNyMeeting
+        addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
+            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
+            contact_person='My Name', contact_email='my.email@my.domain')
+        self.portal.info.mymeeting.approveThis()
+        self.portal.recatalogNyObject(self.portal.info.mymeeting)
+
+        addPortalMeetingParticipant(self.portal)
+        self.portal.info.mymeeting.participants._add_user('test_participant')
+
+        try:
+            manage_addSurveyTool(self.portal)
+        except:
+            pass
+        meeting = self.portal.info.mymeeting
+        manage_addMegaSurvey(meeting, title='MySurvey')
+        meeting.survey_pointer = 'info/mymeeting/mysurvey'
+        import transaction; transaction.commit()
+
+    def beforeTearDown(self):
+        removePortalMeetingParticipant(self.portal)
+        self.portal.info.manage_delObjects(['mymeeting'])
+        self.portal.manage_uninstall_pluggableitem('Naaya Meeting')
+        import transaction; transaction.commit()
+
+    def test_survey_not_required(self):
+        self.portal.info.mymeeting.survey_required = False
+        import transaction; transaction.commit()
+
+        self.browser_do_login('test_participant', 'participant')
+        self.browser.go('http://localhost/portal/info/mymeeting')
+        self.assertEqual(self.browser.get_url(), 'http://localhost/portal/info/mymeeting')
+        self.assertTrue('Take the survey' in self.browser.get_html())
+        self.browser_do_logout()
+
+    def test_survey_required(self):
+        self.portal.info.mymeeting.survey_required = True
+        import transaction; transaction.commit()
+
+        self.browser_do_login('test_participant', 'participant')
+        self.browser.go('http://localhost/portal/info/mymeeting')
+        self.assertEqual(self.browser.get_url(), 'http://localhost/portal/info/mymeeting/mysurvey')
+        self.browser_do_logout()
+
 def test_suite():
     suite = TestSuite()
     suite.addTest(makeSuite(NyMeetingCreateTestCase))
     suite.addTest(makeSuite(NyMeetingEditingTestCase))
     suite.addTest(makeSuite(NyMeetingFunctionalTestCase))
     suite.addTest(makeSuite(NyMeetingParticipantsTestCase))
+    suite.addTest(makeSuite(NyMeetingSurveyTestCase))
     return suite
 
