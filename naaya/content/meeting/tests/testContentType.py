@@ -1,7 +1,3 @@
-# Authors:
-# Alin Voinea, Eau de Web
-# Andrei Laza, Eau de Web
-
 from unittest import TestSuite, makeSuite
 from naaya.content.meeting.meeting import addNyMeeting as addNaayaContent
 from naaya.content.meeting.meeting import NyMeeting as NaayaContent

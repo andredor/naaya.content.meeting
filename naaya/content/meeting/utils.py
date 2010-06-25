@@ -1,6 +1,3 @@
-#Authors:
-#Andrei Laza, Eau de Web
-
 # !!!! These should be moved to auth_tool
 
 def _encode(val):

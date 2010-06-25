@@ -1,6 +1,3 @@
-# Authors:
-# Andrei Laza, Eau de Web
-
 #Python imports
 try:
     import json

@@ -1,6 +1,3 @@
-# Authors:
-# Andrei Laza, Eau de Web
-
 #Python imports
 
 #Zope imports

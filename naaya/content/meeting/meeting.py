@@ -1,6 +1,3 @@
-# Authors:
-# Andrei Laza, Eau de Web
-
 #Python imports
 from copy import deepcopy
 import os
@@ -364,7 +361,7 @@ class NyMeeting(NyContentData, NyFolder):
 
         REQUEST.RESPONSE.redirect(self.absolute_url())
 
-    def get_ics(self, REQUEST=None):
+    def get_ics(self, REQUEST):
         """ Export this meeting as 'ics' """
 
         cal = vobject.iCalendar()
@@ -393,11 +390,10 @@ class NyMeeting(NyContentData, NyFolder):
 
         ics_data = cal.serialize()
 
-        if REQUEST is not None:
-            REQUEST.RESPONSE.setHeader('Content-Type', 'text/calendar')
-            REQUEST.RESPONSE.setHeader('Content-Disposition',
-                               'attachment;filename=%s.ics' % self.getId())
-            REQUEST.RESPONSE.write(ics_data)
+        REQUEST.RESPONSE.setHeader('Content-Type', 'text/calendar')
+        REQUEST.RESPONSE.setHeader('Content-Disposition',
+                           'attachment;filename=%s.ics' % self.getId())
+        REQUEST.RESPONSE.write(ics_data)
 
 InitializeClass(NyMeeting)
 
