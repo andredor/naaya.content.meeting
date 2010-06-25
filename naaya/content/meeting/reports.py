@@ -24,6 +24,8 @@ class MeetingReports(SimpleItem):
     security = ClassSecurityInfo()
 
     title = "Meeting Reports"
+    participant_icon = 'images/report_icons/participant.gif'
+    organisation_icon = 'images/report_icons/organisation.gif'
 
     def __init__(self, id):
         """ """
@@ -56,7 +58,7 @@ class MeetingReports(SimpleItem):
                                     }})
 
             name = getUserFullName(site, uid)
-            icon = 'images/report_icons/participant.gif'
+            icon = self.participant_icon
             user_node = {'data':
                                 {'title': name,
                                  'icon': icon,
@@ -79,48 +81,50 @@ class MeetingReports(SimpleItem):
         meeting_config = meeting_module.get_config()
         meeting_obs = site.getCatalogedObjectsCheckView(meta_type=meeting_config['meta_type'], approved=1)
 
-        for meeting in meeting_obs:
+        for i, meeting in enumerate(meeting_obs):
             for uid in meeting.participants.uids:
                 organisation = getUserOrganisation(site, uid)
                 if organisation not in organisations:
                     organisations[organisation] = {}
-                if uid not in organisations[organisation]:
-                    organisations[organisation][uid] = []
-                organisations[organisation][uid].append(meeting)
+                if i not in organisations[organisation]:
+                    organisations[organisation][i] = []
+                organisations[organisation][i].append(uid)
 
         for organisation, values in organisations.iteritems():
-            user_nodes = []
-            for uid, meetings in values.iteritems():
-                meeting_nodes = []
-                for meeting in meetings:
-                    title = meeting.title_or_id()
-                    icon = meeting.icon
-                    href = meeting.absolute_url()
-                    meeting_nodes.append({'data':
-                                                {'title': title,
-                                                 'icon': icon,
-                                                 'attributes':
-                                                         {'href': href}
-                                        }})
-                name = getUserFullName(site, uid)
-                icon = 'images/report_icons/participant.gif'
-                user_node = {'data':
-                                    {'title': name,
-                                     'icon': icon,
-                                     'attributes':
-                                        {'href': ''}
-                                    },
-                                'children': meeting_nodes}
-                email = getUserEmail(site, uid)
-                if email is not None:
-                    href = 'mailto:' + email
-                    user_node['data']['attributes'] = {'href': href}
-                user_nodes.append(user_node)
-            
+            meeting_nodes = []
+            for i, uids in values.iteritems():
+                meeting = meeting_obs[i]
+
+                user_nodes = []
+                for uid in uids:
+                    name = getUserFullName(site, uid)
+                    user_node = {'data':
+                                        {'title': name,
+                                        'icon': self.participant_icon,
+                                        'attributes':
+                                            {'href': ''}
+                                        }}
+                    email = getUserEmail(site, uid)
+                    if email is not None:
+                        href = 'mailto:' + email
+                        user_node['data']['attributes']['href'] = href
+                    user_nodes.append(user_node)
+
+                title = meeting.title_or_id()
+                href = meeting.absolute_url()
+                meeting_nodes.append({'data':
+                                        {'title': title,
+                                        'icon': meeting.icon,
+                                        'attributes':
+                                            {'href': href}},
+                                    'children': user_nodes})
+
+
             jstree.append({'data':
                                 {'title': organisation,
-                                'icon': 'images/report_icons/organisation.gif',},
-                            'children': user_nodes
+                                'icon': self.organisation_icon
+                            },
+                            'children': meeting_nodes
                         })
         return json.dumps(jstree)
  
