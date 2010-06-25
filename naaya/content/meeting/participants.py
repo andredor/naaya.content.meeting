@@ -72,13 +72,10 @@ class Participants(SimpleItem):
 
     def addUsers(self, REQUEST):
         """ """
-        if 'uid' in REQUEST.form:
-            uid = REQUEST.form['uid']
-            if type(uid) == type([]):
-                for u in uid:
-                    self._add_user(u)
-            else:
-                self._add_user(uid)
+        uids = REQUEST.form['uids']
+        assert isinstance(uids, list)
+        for uid in uids:
+            self._add_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
     def _remove_user(self, uid):
@@ -87,13 +84,10 @@ class Participants(SimpleItem):
 
     def removeUsers(self, REQUEST):
         """ """
-        if 'uid' in REQUEST.form:
-            uid = REQUEST.form['uid']
-            if type(uid) == type([]):
-                for u in uid:
-                    self._remove_user(u)
-            else:
-                self._remove_user(uid)
+        uids = REQUEST.form['uids']
+        assert isinstance(uids, list)
+        for uid in uids:
+            self._remove_user(uid)
         return REQUEST.RESPONSE.redirect(self.absolute_url())
 
     security.declareProtected(change_permissions, 'setAdministrator')

@@ -57,7 +57,7 @@
                 </tr>
                 <tr tal:repeat="item users"
                         tal:attributes="class python:test(path('repeat/item/odd'), 'odd', 'even')">
-                    <td><input type="checkbox" name="uid" tal:attributes="value item/uid"/></td>
+                    <td><input type="checkbox" name="uids:list" tal:attributes="value item/uid"/></td>
                     <td><span tal:replace="item/uid"/></td>
                     <td><span tal:replace="item/cn"/></td>
                     <td><span tal:replace="item/info"/></td>
@@ -120,7 +120,7 @@
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
                     <tal:block define="user_info python:here.getParticipantInfo(user)">
-                    <td><input type="checkbox" name="uid" tal:attributes="value user_info/uid"/></td>
+                    <td><input type="checkbox" name="uids:list" tal:attributes="value user_info/uid"/></td>
                     <td><span tal:replace="user"/></td>
                     <td tal:define="name user_info/name">
                         <span tal:condition="name" tal:replace="name"/>

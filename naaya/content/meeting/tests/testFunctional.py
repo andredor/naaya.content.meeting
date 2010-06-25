@@ -313,7 +313,7 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
         self.browser.submit()
 
         form = self.browser.get_form('formAddUsers')
-        expected_controls = set(['uid', 'add_users'])
+        expected_controls = set(['uids:list', 'add_users'])
         found_controls = set(c.name for c in form.controls)
         self.assertTrue(expected_controls <= found_controls,
             'Missing form controls: %s' % repr(expected_controls - found_controls))
@@ -452,25 +452,25 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         form['search_term:utf8:ustring'] = 'test_participant'
         self.browser.submit()
         form = self.browser.get_form('formAddUsers')
-        expected_controls = set(['uid', 'add_users'])
+        expected_controls = set(['uids:list', 'add_users'])
         found_controls = set(c.name for c in form.controls)
         self.assertTrue(expected_controls <= found_controls,
             'Missing form controls: %s' % repr(expected_controls - found_controls))
         self.assertTrue('test_participant' in self.browser.get_html())
 
-        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
-        form['uid'] = ['test_participant']
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uids:list'))
+        form['uids:list'] = ['test_participant']
         self.browser.submit()
 
         form = self.browser.get_form('formDeleteUsers')
-        expected_controls = set(['uid', 'remove_users'])
+        expected_controls = set(['uids:list', 'remove_users'])
         found_controls = set(c.name for c in form.controls)
         self.assertTrue(expected_controls <= found_controls,
             'Missing form controls: %s' % repr(expected_controls - found_controls))
         self.assertTrue('test_participant' in self.browser.get_html())
 
-        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
-        form['uid'] = ['test_participant']
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uids:list'))
+        form['uids:list'] = ['test_participant']
         self.browser.submit()
         self.assertTrue('test_participant' not in self.browser.get_html())
 
@@ -504,8 +504,8 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         form['search_term:utf8:ustring'] = 'test_participant'
         self.browser.submit()
         form = self.browser.get_form('formAddUsers')
-        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
-        form['uid'] = ['test_participant']
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uids:list'))
+        form['uids:list'] = ['test_participant']
         self.browser.submit()
         self.browser_do_logout()
         assert_access()
@@ -513,8 +513,8 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.browser_do_login('admin', '')
         self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formDeleteUsers')
-        self.browser.clicked(form, self.browser.get_form_field(form, 'uid'))
-        form['uid'] = ['test_participant']
+        self.browser.clicked(form, self.browser.get_form_field(form, 'uids:list'))
+        form['uids:list'] = ['test_participant']
         self.browser.submit()
         self.browser_do_logout()
         assert_no_access()
