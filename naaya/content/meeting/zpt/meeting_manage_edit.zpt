@@ -30,6 +30,10 @@
 	<td><input type="text" name="survey_pointer:utf8:ustring" size="50" tal:attributes="value here/survey_pointer" /></td>
 </tr>
 <tr>
+	<td class="form-label">Survey Required</td>
+	<td><input type="checkbox" name="survey_required" tal:attributes="checked here/survey_required" /></td>
+</tr>
+<tr>
 	<td class="form-label">Contact person</td>
 	<td><input type="text" name="contact_person:utf8:ustring" size="50" tal:attributes="value here/contact_person" /></td>
 </tr>

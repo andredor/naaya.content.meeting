@@ -39,14 +39,15 @@ from reports import MeetingReports
 
 #module constants
 DEFAULT_SCHEMA = {
-    'location':         dict(sortorder=100, widget_type='String',   label='Meeting location', localized=True),
-    'start_date':       dict(sortorder=130, widget_type='Date',     label='Start date', data_type='date', required=True),
-    'end_date':         dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
-    'agenda_pointer':       dict(sortorder=210, widget_type='Pointer',   label='Agenda Pointer'),
-    'minutes_pointer':      dict(sortorder=210, widget_type='Pointer',   label='Minutes Pointer'),
-    'survey_pointer':       dict(sortorder=210, widget_type='Pointer',   label='Survey Pointer'),
-    'contact_person':   dict(sortorder=210, widget_type='String',   label='Contact person'),
-    'contact_email':    dict(sortorder=210, widget_type='String',   label='Contact email', required=True),
+    'location':             dict(sortorder=100, widget_type='String',   label='Meeting location', localized=True),
+    'start_date':           dict(sortorder=130, widget_type='Date',     label='Start date', data_type='date', required=True),
+    'end_date':             dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
+    'agenda_pointer':       dict(sortorder=210, widget_type='Pointer',  label='Agenda Pointer'),
+    'minutes_pointer':      dict(sortorder=220, widget_type='Pointer',  label='Minutes Pointer'),
+    'survey_pointer':       dict(sortorder=230, widget_type='Pointer',  label='Survey Pointer'),
+    'survey_required':      dict(sortorder=240, widget_type='Checkbox', label='Survey Required', data_type='bool'),
+    'contact_person':       dict(sortorder=250, widget_type='String',   label='Contact person'),
+    'contact_email':        dict(sortorder=260, widget_type='String',   label='Contact email', required=True),
 }
 DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
 
@@ -193,6 +194,7 @@ class NyMeeting(NyContentData, NyFolder):
         """ """
         NyFolder.__dict__['__init__'](self, id, contributor)
         self.participants = Participants('participants')
+        self.survey_required = False
 
     security.declarePrivate('objectkeywords')
     def objectkeywords(self, lang):
@@ -316,6 +318,18 @@ class NyMeeting(NyContentData, NyFolder):
     security.declareProtected(view, 'index_html')
     def index_html(self, REQUEST=None, RESPONSE=None):
         """ """
+        if self.survey_required:
+            current_user = REQUEST.AUTHENTICATED_USER.getUserName()
+            if current_user in self.participants.uids:
+                site = self.getSite()
+                path = str(self.survey_pointer)
+                survey_ob = site.unrestrictedTraverse(path, None)
+                if survey_ob is not None and survey_ob.meta_type == 'Naaya Mega Survey':
+                    answers = survey_ob.getAnswers()
+                    respondents = [a.respondent for a in answers]
+                    if current_user not in respondents:
+                        REQUEST.RESPONSE.redirect('%s/%s' % (self.getSite().absolute_url(), self.survey_pointer))
+
         if self.publicinterface:
             l_index = self._getOb('index', None)
             if l_index is not None: return l_index()

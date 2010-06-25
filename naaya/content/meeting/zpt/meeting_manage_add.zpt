@@ -30,6 +30,10 @@
 	<td><input type="text" name="survey_pointer:utf8:ustring" value="" size="50" /></td>
 </tr>
 <tr>
+	<td class="form-label">Survey Required</td>
+	<td><input type="checkbox" name="survey_required" /></td>
+</tr>
+<tr>
 	<td class="form-label">Contact person</td>
 	<td><input type="text" name="contact_person:utf8:ustring" value="" size="50" /></td>
 </tr>
