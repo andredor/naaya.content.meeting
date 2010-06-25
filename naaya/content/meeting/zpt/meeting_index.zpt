@@ -98,6 +98,7 @@
             <p>
                 <a tal:condition="here/agenda_url" tal:attributes="href here/agenda_url" i18n:translate="Agenda"></a>
                 <a tal:condition="here/minutes_url" tal:attributes="href here/minutes_url" i18n:translate="Minutes"></a>
+                <a tal:condition="here/survey_url" tal:attributes="href here/survey_url" i18n:translate="Take the survey"></a>
             </p>
 
             <table border="0" cellspacing="2" cellpadding="2">

@@ -44,6 +44,7 @@ DEFAULT_SCHEMA = {
     'end_date':         dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
     'agenda_url':       dict(sortorder=210, widget_type='String',   label='Agenda URL'),
     'minutes_url':      dict(sortorder=210, widget_type='String',   label='Minutes URL'),
+    'survey_url':       dict(sortorder=210, widget_type='String',   label='Survey URL'),
     'contact_person':   dict(sortorder=210, widget_type='String',   label='Contact person'),
     'contact_email':    dict(sortorder=210, widget_type='String',   label='Contact email', required=True),
 }
@@ -80,7 +81,8 @@ def meeting_on_install(site):
     Permissions are set similar to the Authenticated role.
     """
     grouppermissions = ['Browse content', 'Add comments']
-    permissions = ['Naaya - Skip Captcha']
+    permissions = ['Naaya - Skip Captcha',
+        'Naaya - Add Naaya Survey Answer', 'Naaya - View Naaya Survey Answers']
 
     auth_tool = site.getAuthenticationTool()
 
@@ -198,12 +200,13 @@ class NyMeeting(NyContentData, NyFolder):
 
     security.declarePrivate('export_this_tag_custom')
     def export_this_tag_custom(self):
-        return 'start_date="%s" end_date="%s" agenda_url="%s" minutes_url="%s" contact_person="%s" contact_email="%s"' % \
+        return 'start_date="%s" end_date="%s" agenda_url="%s" minutes_url="%s" survey_url="%s" contact_person="%s" contact_email="%s"' % \
             (
                 self.utXmlEncode(self.utNoneToEmpty(self.start_date)),
                 self.utXmlEncode(self.utNoneToEmpty(self.end_date)),
                 self.utXmlEncode(self.agenda_url),
                 self.utXmlEncode(self.minutes_url),
+                self.utXmlEncode(self.survey_url),
                 self.utXmlEncode(self.contact_person),
                 self.utXmlEncode(self.contact_email),
             )
