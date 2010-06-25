@@ -31,6 +31,7 @@ from Products.NaayaCore.managers.utils import make_id
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.core.zope2util import DT2dt
 from interfaces import INyMeeting
+from Products.Naaya.NySite import NySite
 
 #Meeting imports
 from naaya.content.meeting import PARTICIPANT_ROLE
@@ -95,7 +96,7 @@ def meeting_on_install(site):
     b.extend(permissions)
     site.manage_role(PARTICIPANT_ROLE, b)
 
-    site.meeting_reports = MeetingReports('meeting_reports')
+    NySite.meeting_reports = MeetingReports('meeting_reports')
     
 def meeting_add_html(self):
     """ """
