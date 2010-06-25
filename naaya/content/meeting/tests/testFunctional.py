@@ -37,7 +37,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         form = self.browser.get_form('frmAdd')
         expected_controls = set(['title:utf8:ustring', 'location:utf8:ustring',
             'releasedate', 'start_date', 'end_date',
-            'agenda_url:utf8:ustring', 'minutes_url:utf8:ustring',
+            'agenda_pointer:utf8:ustring', 'minutes_pointer:utf8:ustring', 'survey_pointer:utf8:ustring',
             'contact_person:utf8:ustring', 'contact_email:utf8:ustring'])
         found_controls = set(c.name for c in form.controls)
         self.assertTrue(expected_controls <= found_controls, 
@@ -88,7 +88,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         form = self.browser.get_form('frmAdd')
         expected_controls = set(['title:utf8:ustring', 'location:utf8:ustring',
             'releasedate', 'start_date', 'end_date',
-            'agenda_url:utf8:ustring', 'minutes_url:utf8:ustring',
+            'agenda_pointer:utf8:ustring', 'minutes_pointer:utf8:ustring', 'survey_pointer:utf8:ustring',
             'contact_person:utf8:ustring', 'contact_email:utf8:ustring'])
         found_controls = set(c.name for c in form.controls)
         self.assertTrue(expected_controls <= found_controls, 

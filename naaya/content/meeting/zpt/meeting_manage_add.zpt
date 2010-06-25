@@ -18,12 +18,16 @@
 	<td><input type="text" name="end_date" size="10" value="" /></td>
 </tr>
 <tr>
-	<td class="form-label">Agenda URL</td>
-	<td><input type="text" name="agenda_url:utf8:ustring" value="" size="50" /></td>
+	<td class="form-label">Agenda Pointer</td>
+	<td><input type="text" name="agenda_pointer:utf8:ustring" value="" size="50" /></td>
 </tr>
 <tr>
-	<td class="form-label">Minutes URL</td>
-	<td><input type="text" name="minutes_url:utf8:ustring" value="" size="50" /></td>
+	<td class="form-label">Minutes Pointer</td>
+	<td><input type="text" name="minutes_pointer:utf8:ustring" value="" size="50" /></td>
+</tr>
+<tr>
+	<td class="form-label">Survey Pointer</td>
+	<td><input type="text" name="survey_pointer:utf8:ustring" value="" size="50" /></td>
 </tr>
 <tr>
 	<td class="form-label">Contact person</td>

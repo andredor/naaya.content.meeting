@@ -42,9 +42,9 @@ DEFAULT_SCHEMA = {
     'location':         dict(sortorder=100, widget_type='String',   label='Meeting location', localized=True),
     'start_date':       dict(sortorder=130, widget_type='Date',     label='Start date', data_type='date', required=True),
     'end_date':         dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
-    'agenda_url':       dict(sortorder=210, widget_type='String',   label='Agenda URL'),
-    'minutes_url':      dict(sortorder=210, widget_type='String',   label='Minutes URL'),
-    'survey_url':       dict(sortorder=210, widget_type='String',   label='Survey URL'),
+    'agenda_pointer':       dict(sortorder=210, widget_type='Pointer',   label='Agenda Pointer'),
+    'minutes_pointer':      dict(sortorder=210, widget_type='Pointer',   label='Minutes Pointer'),
+    'survey_pointer':       dict(sortorder=210, widget_type='Pointer',   label='Survey Pointer'),
     'contact_person':   dict(sortorder=210, widget_type='String',   label='Contact person'),
     'contact_email':    dict(sortorder=210, widget_type='String',   label='Contact email', required=True),
 }
@@ -200,13 +200,13 @@ class NyMeeting(NyContentData, NyFolder):
 
     security.declarePrivate('export_this_tag_custom')
     def export_this_tag_custom(self):
-        return 'start_date="%s" end_date="%s" agenda_url="%s" minutes_url="%s" survey_url="%s" contact_person="%s" contact_email="%s"' % \
+        return 'start_date="%s" end_date="%s" agenda_pointer="%s" minutes_pointer="%s" survey_pointer="%s" contact_person="%s" contact_email="%s"' % \
             (
                 self.utXmlEncode(self.utNoneToEmpty(self.start_date)),
                 self.utXmlEncode(self.utNoneToEmpty(self.end_date)),
-                self.utXmlEncode(self.agenda_url),
-                self.utXmlEncode(self.minutes_url),
-                self.utXmlEncode(self.survey_url),
+                self.utXmlEncode(self.agenda_pointer),
+                self.utXmlEncode(self.minutes_pointer),
+                self.utXmlEncode(self.survey_pointer),
                 self.utXmlEncode(self.contact_person),
                 self.utXmlEncode(self.contact_email),
             )
