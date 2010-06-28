@@ -40,7 +40,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         self.assertTrue('<h1>Submit Meeting</h1>' in self.browser.get_html())
 
         form = self.browser.get_form('frmAdd')
-        expected_controls = set(['title:utf8:ustring', 'location:utf8:ustring',
+        expected_controls = set(['title:utf8:ustring', 'geo_location.address:utf8:ustring',
             'releasedate', 'start_date', 'end_date',
             'agenda_pointer:utf8:ustring', 'minutes_pointer:utf8:ustring', 'survey_pointer:utf8:ustring',
             'contact_person:utf8:ustring', 'contact_email:utf8:ustring'])
@@ -50,7 +50,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'title'))
         form['title:utf8:ustring'] = 'MyMeeting'
-        form['location:utf8:ustring'] = 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'
+        form['geo_location.address:utf8:ustring'] = 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'
         form['releasedate'] = '16/06/2010'
         form['start_date'] = '20/06/2010'
         form['end_date'] = '25/06/2010'
@@ -91,7 +91,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
         self.assertTrue('Add Naaya Meeting' in self.browser.get_html())
 
         form = self.browser.get_form('frmAdd')
-        expected_controls = set(['title:utf8:ustring', 'location:utf8:ustring',
+        expected_controls = set(['title:utf8:ustring', 'geo_location.address:utf8:ustring',
             'releasedate', 'start_date', 'end_date',
             'agenda_pointer:utf8:ustring', 'minutes_pointer:utf8:ustring', 'survey_pointer:utf8:ustring',
             'contact_person:utf8:ustring', 'contact_email:utf8:ustring'])
@@ -101,7 +101,7 @@ class NyMeetingCreateTestCase(NaayaFunctionalTestCase):
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'title'))
         form['title:utf8:ustring'] = 'MyMeeting2'
-        form['location:utf8:ustring'] = 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'
+        form['geo_location.address:utf8:ustring'] = 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'
         form['releasedate'] = '16/06/2010'
         form['start_date'] = '20/06/2010'
         form['end_date'] = '25/06/2010'
@@ -130,14 +130,15 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
         from naaya.content.meeting.meeting import addNyMeeting
+        location = {'geo_location.address': 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'}
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
-            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            title='MyMeeting',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
-            contact_person='My Name', contact_email='my.email@my.domain')
+            contact_person='My Name', contact_email='my.email@my.domain', **location)
         addNyMeeting(self.portal.info, 'mymeeting2', contributor='contributor', submitted=1,
-            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            title='MyMeeting',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
-            contact_person='My Name', contact_email='my.email@my.domain')
+            contact_person='My Name', contact_email='my.email@my.domain', **location)
         self.portal.info.mymeeting.approveThis()
         self.portal.info.mymeeting2.approveThis()
         import transaction; transaction.commit()
@@ -156,7 +157,7 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
 
         form = self.browser.get_form('frmEdit')
         self.assertEqual(form['title:utf8:ustring'], 'MyMeeting')
-        self.assertEqual(form['location:utf8:ustring'], 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark')
+        self.assertEqual(form['geo_location.address:utf8:ustring'], 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark')
         self.assertEqual(form['releasedate'], '16/06/2010')
         self.assertEqual(form['start_date'], '20/06/2010')
         self.assertEqual(form['end_date'], '25/06/2010')
@@ -165,7 +166,7 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'title'))
         form['title:utf8:ustring'] = 'MyEditedMeeting'
-        form['location:utf8:ustring'] = 'Kogens Nytorv 8, 1050 Copenhagen K, Denmark'
+        form['geo_location.address:utf8:ustring'] = 'Kogens Nytorv 8, 1050 Copenhagen K, Denmark'
         form['releasedate'] = '17/06/2010'
         form['start_date'] = '21/06/2010'
         form['end_date'] = '26/06/2010'
@@ -209,7 +210,7 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
 
         form = self.browser.get_form('frmEdit')
         self.assertEqual(form['title:utf8:ustring'], 'MyMeeting')
-        self.assertEqual(form['location:utf8:ustring'], 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark')
+        self.assertEqual(form['geo_location.address:utf8:ustring'], 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark')
         self.assertEqual(form['releasedate'], '16/06/2010')
         self.assertEqual(form['start_date'], '20/06/2010')
         self.assertEqual(form['end_date'], '25/06/2010')
@@ -218,7 +219,7 @@ class NyMeetingEditingTestCase(NaayaFunctionalTestCase):
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'title'))
         form['title:utf8:ustring'] = 'MyEditedMeeting'
-        form['location:utf8:ustring'] = 'Kogens Nytorv 8, 1050 Copenhagen K, Denmark'
+        form['geo_location.address:utf8:ustring'] = 'Kogens Nytorv 8, 1050 Copenhagen K, Denmark'
         form['releasedate'] = '17/06/2010'
         form['start_date'] = '21/06/2010'
         form['end_date'] = '26/06/2010'
@@ -245,10 +246,11 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
         from naaya.content.meeting.meeting import addNyMeeting
+        location = {'geo_location.address': 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'}
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
-            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            title='MyMeeting',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
-            contact_person='My Name', contact_email='my.email@my.domain')
+            contact_person='My Name', contact_email='my.email@my.domain', **location)
         self.portal.info.mymeeting.approveThis()
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
         addPortalMeetingParticipant(self.portal)
@@ -423,10 +425,11 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
         from naaya.content.meeting.meeting import addNyMeeting
+        location = {'geo_location.address': 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'}
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
-            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            title='MyMeeting',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
-            contact_person='My Name', contact_email='my.email@my.domain')
+            contact_person='My Name', contact_email='my.email@my.domain', **location)
         self.portal.info.mymeeting.approveThis()
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
 
@@ -530,10 +533,11 @@ class NyMeetingSurveyTestCase(NaayaFunctionalTestCase):
     def afterSetUp(self):
         self.portal.manage_install_pluggableitem('Naaya Meeting')
         from naaya.content.meeting.meeting import addNyMeeting
+        location = {'geo_location.address': 'Kogens Nytorv 6, 1050 Copenhagen K, Denmark'}
         addNyMeeting(self.portal.info, 'mymeeting', contributor='contributor', submitted=1,
-            title='MyMeeting', location='Kogens Nytorv 6, 1050 Copenhagen K, Denmark',
+            title='MyMeeting',
             releasedate='16/06/2010', start_date='20/06/2010', end_date='25/06/2010',
-            contact_person='My Name', contact_email='my.email@my.domain')
+            contact_person='My Name', contact_email='my.email@my.domain', **location)
         self.portal.info.mymeeting.approveThis()
         self.portal.recatalogNyObject(self.portal.info.mymeeting)
 

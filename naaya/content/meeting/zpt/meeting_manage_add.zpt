@@ -7,7 +7,7 @@
 <tal:block metal:fill-slot="custom_properties">
 <tr>
 	<td class="form-label">Meeting location</td>
-	<td><input type="text" name="location:utf8:ustring" value="" size="50" /></td>
+	<td><input type="text" name="geo_location.address:utf8:ustring" value="" size="50" /></td>
 </tr>
 <tr>
 	<td class="form-label">Start date (<em>dd/mm/yyyy</em>)</td>

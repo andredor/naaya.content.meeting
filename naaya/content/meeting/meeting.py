@@ -38,7 +38,6 @@ from reports import MeetingReports
 
 #module constants
 DEFAULT_SCHEMA = {
-    'location':             dict(sortorder=100, widget_type='String',   label='Meeting location', localized=True),
     'start_date':           dict(sortorder=130, widget_type='Date',     label='Start date', data_type='date', required=True),
     'end_date':             dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
     'contact_person':       dict(sortorder=150, widget_type='String',   label='Contact person'),
@@ -49,6 +48,8 @@ DEFAULT_SCHEMA = {
     'minutes_pointer':      dict(sortorder=320, widget_type='Pointer',  label='Link to the Meeting Minutes'),
 }
 DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
+DEFAULT_SCHEMA['geo_location'].update(visible=True, required=True)
+DEFAULT_SCHEMA['geo_type'].update(visible=True)
 
 # this dictionary is updated at the end of the module
 config = {
@@ -201,12 +202,13 @@ class NyMeeting(NyContentData, NyFolder):
 
     security.declarePrivate('objectkeywords')
     def objectkeywords(self, lang):
-        return u' '.join([self._objectkeywords(lang), self.getLocalProperty('location', lang)])
+        return u' '.join([self._objectkeywords(lang), self.geo_address()])
 
     security.declarePrivate('export_this_tag_custom')
     def export_this_tag_custom(self):
-        return 'start_date="%s" end_date="%s" agenda_pointer="%s" minutes_pointer="%s" survey_pointer="%s" contact_person="%s" contact_email="%s"' % \
+        return 'location="%s" start_date="%s" end_date="%s" agenda_pointer="%s" minutes_pointer="%s" survey_pointer="%s" contact_person="%s" contact_email="%s"' % \
             (
+                self.utXmlEncode(self.geo_address()),
                 self.utXmlEncode(self.utNoneToEmpty(self.start_date)),
                 self.utXmlEncode(self.utNoneToEmpty(self.end_date)),
                 self.utXmlEncode(self.agenda_pointer),
@@ -219,9 +221,6 @@ class NyMeeting(NyContentData, NyFolder):
     security.declarePrivate('export_this_body_custom')
     def export_this_body_custom(self):
         r = []
-        ra = r.append
-        for l in self.gl_get_languages():
-            ra('<location lang="%s"><![CDATA[%s]]></location>' % (l, self.utToUtf8(self.getLocalProperty('location', l))))
         return ''.join(r)
 
     security.declarePrivate('syndicateThis')
@@ -239,7 +238,7 @@ class NyMeeting(NyContentData, NyFolder):
         ra('<dc:publisher>%s</dc:publisher>' % self.utXmlEncode(l_site.getLocalProperty('publisher', lang)))
         ra('<ev:startdate>%s</ev:startdate>' % self.utShowFullDateTimeHTML(self.start_date))
         ra('<ev:enddate>%s</ev:enddate>' % self.utShowFullDateTimeHTML(self.end_date))
-        ra('<ev:location>%s</ev:location>' % self.utXmlEncode(self.getLocalProperty('location', lang)))
+        ra('<ev:location>%s</ev:location>' % self.utXmlEncode(self.geo_address()))
         ra('<ev:organizer>%s</ev:organizer>' % self.utXmlEncode(self.contact_person))
         ra('<ev:type>Meeting</ev:type>')
         ra(self.syndicateThisFooter())
@@ -387,8 +386,8 @@ class NyMeeting(NyContentData, NyFolder):
                                          datetime.timedelta(days=1))
 
         loc = []
-        if self.location:
-            loc.append(self.location)
+        if self.geo_address():
+            loc.append(self.self.geo_address)
 
         if loc:
             cal.vevent.add('location').value = ', '.join(loc)

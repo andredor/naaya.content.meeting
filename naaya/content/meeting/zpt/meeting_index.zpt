@@ -64,10 +64,10 @@
                 </tal:block>
                 </td>
             </tr>
-            <tr tal:condition="here/location">
-                <th i18n:translate="" tal:content="python: here.prop_details('location')['label']" />
+            <tr tal:condition="here/geo_address">
+                <th i18n:translate="Meeting location"></th>
                 <td>
-                    <span tal:replace="here/location"/>
+                    <span tal:replace="here/geo_address"/>
                 </td>
             </tr>
             <tr tal:define="
