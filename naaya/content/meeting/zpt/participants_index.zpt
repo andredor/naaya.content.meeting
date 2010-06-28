@@ -6,7 +6,7 @@
     <metal:block fill-slot="body">
     <h1>
         <img tal:attributes="src python:test(here.aq_parent.approved, here.aq_parent.icon, here.aq_parent.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
-        <tal:block tal:replace="here/title_or_id" />
+        <tal:block tal:replace="here/aq_parent/title" /> - <tal:block tal:replace="here/title" />
     </h1>
 
     <div class="floated-buttons">
@@ -15,11 +15,11 @@
         </span>
     </div>
 
-    <p i18n:translate="This page lists the meeting participants and lets search for and add new participants or to remove existing participants."></p>
+    <p i18n:translate="This page is for managing the meeting participants. You can search and add participants, remove participants and select administrators for this meeting."></p>
 
     <fieldset>
         <legend i18n:translate="Search and Add Users"></legend>
-        <p i18n:translate="Use this form to find users and assign them to the meeting."></p>
+        <p i18n:translate="Use this form to find EIONET LDAP or local users and assign them to the meeting."></p>
         <tal:block define="
             search_param python:request.get('search_param', '');
             search_term python:request.get('search_term', '');
@@ -27,13 +27,13 @@
         <form method="get" action="." name="formSearchUsers">
             <label for="search_param" i18n:translate="Search for"></label>
             <select id="search_param" name="search_param">
-                <option value="uid"
-                    tal:attributes="selected python:search_param=='uid'"
-                    i18n:translate="User ID">
-                </option>
                 <option value="cn"
                     tal:attributes="selected python:search_param=='cn'"
                     i18n:translate="User name">
+                </option>
+                <option value="uid"
+                    tal:attributes="selected python:search_param=='uid'"
+                    i18n:translate="User ID">
                 </option>
             </select>
 
@@ -51,15 +51,15 @@
             <table class="datatable" width="95%">
                 <tr>
                     <th width="30px" i18n:translate="Select"></th>
-                    <th i18n:translate="User ID"></th>
                     <th i18n:translate="User name"></th>
+                    <th i18n:translate="User ID"></th>
                     <th width="60%" i18n:translate="Other information"></th>
                 </tr>
                 <tr tal:repeat="item users"
                         tal:attributes="class python:test(path('repeat/item/odd'), 'odd', 'even')">
                     <td><input type="checkbox" name="uids:list" tal:attributes="value item/uid"/></td>
-                    <td><span tal:replace="item/uid"/></td>
                     <td><span tal:replace="item/cn"/></td>
+                    <td><span tal:replace="item/uid"/></td>
                     <td><span tal:replace="item/info"/></td>
                 </tr>
             </table>
@@ -89,7 +89,7 @@
                 <option tal:repeat="user users" tal:content="user" tal:attributes="value user; selected python:admin==user"/>
             </select>
 
-            <input type="submit" name="set_administrator" value="Set administrator"/>
+            <input type="submit" name="set_administrator" value="Set as meeting administrator"/>
         </form>
 
         <form method="post" action="removeUsers" name="formDeleteUsers">
@@ -97,40 +97,36 @@
                 <tr>
                     <th width="30px" i18n:translate="Select"></th>
                     <th>
-                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=uid"
-                             i18n:translate="User ID">
-                        </a>
-                    </th>
-                    <th>
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=name"
-                             i18n:translate="Name">
-                        </a>
+                             i18n:translate="Name"></a>
                     </th>
                     <th>
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=email"
-                             i18n:translate="Email">
-                        </a>
+                             i18n:translate="Email"></a>
                     </th>
                     <th>
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=o"
-                             i18n:translate="Organisation">
-                        </a>
+                             i18n:translate="Organisation"></a>
+                    </th>
+                    <th>
+                        <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=uid"
+                             i18n:translate="User ID"></a>
                     </th>
                 </tr>
                 <tr tal:repeat="user users"
                         tal:attributes="class python:test(path('repeat/user/odd'), 'odd', 'even')">
                     <tal:block define="user_info python:here.getParticipantInfo(user)">
                     <td><input type="checkbox" name="uids:list" tal:attributes="value user_info/uid"/></td>
-                    <td><span tal:replace="user"/></td>
                     <td tal:define="name user_info/name">
                         <span tal:condition="name" tal:replace="name"/>
                     </td>
                     <td tal:define="email user_info/email">
-                        <a tal:condition="email" tal:attributes="href string:mailto:${email}" tal:content="email"/>
+                        <a tal:condition="email" tal:attributes="href string:mailto:${email}" tal:content="email"></a>
                     </td>
                     <td tal:define="organisation user_info/organisation">
                         <span tal:condition="organisation" tal:replace="organisation"/>
                     </td>
+                    <td><span tal:replace="user"/></td>
                     </tal:block>
                 </tr>
             </table>

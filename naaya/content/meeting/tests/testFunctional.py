@@ -306,6 +306,7 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
             'Missing form controls: %s' % repr(expected_controls - found_controls))
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_param'] = ['uid']
         form['search_term:utf8:ustring'] = 'contributor'
         self.browser.submit()
 
@@ -446,6 +447,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.assertTrue('test_participant' not in self.browser.get_html())
 
         self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_param'] = ['uid']
         form['search_term:utf8:ustring'] = 'test_participant'
         self.browser.submit()
         form = self.browser.get_form('formAddUsers')
@@ -498,6 +500,7 @@ class NyMeetingParticipantsTestCase(NaayaFunctionalTestCase):
         self.browser.go('http://localhost/portal/info/mymeeting/participants')
         form = self.browser.get_form('formSearchUsers')
         self.browser.clicked(form, self.browser.get_form_field(form, 'search_term:utf8:ustring'))
+        form['search_param'] = ['uid']
         form['search_term:utf8:ustring'] = 'test_participant'
         self.browser.submit()
         form = self.browser.get_form('formAddUsers')

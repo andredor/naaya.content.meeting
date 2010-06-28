@@ -15,7 +15,7 @@ from utils import getUserFullName, getUserEmail, getUserOrganisation
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
 
-    title = "Meeting Participants"
+    title = "Meeting participants"
 
     def __init__(self, id):
         """ """
