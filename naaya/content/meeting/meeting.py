@@ -16,6 +16,7 @@ from naaya.content.base.events import NyContentObjectAddEvent
 from naaya.content.base.events import NyContentObjectEditEvent
 from zope.interface import implements
 import zLOG
+from AccessControl.Permission import Permission
 
 #Naaya imports
 from Products.Naaya.NyFolder import NyFolder
@@ -153,6 +154,10 @@ def addNyMeeting(self, id='', REQUEST=None, contributor=None, **kwargs):
     ob.approveThis(approved, approved_by)
     ob.submitThis()
     ob.setRestrictions(access='other', roles=[PARTICIPANT_ROLE])
+
+    # add change permission to administrator
+    permission = Permission('Change permissions', (), ob)
+    permission.setRoles(('Administrator',))
 
     if ob.discussion: ob.open_for_comments()
     self.recatalogNyObject(ob)
