@@ -126,7 +126,7 @@
                         <span tal:condition="name" tal:replace="name"/>
                     </td>
                     <td tal:define="email user_info/email">
-                        <span tal:condition="email" tal:replace="email"/>
+                        <a tal:condition="email" tal:attributes="href string:mailto:${email}" tal:content="email"/>
                     </td>
                     <td tal:define="organisation user_info/organisation">
                         <span tal:condition="organisation" tal:replace="organisation"/>
