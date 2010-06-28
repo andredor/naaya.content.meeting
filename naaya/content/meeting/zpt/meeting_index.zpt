@@ -101,6 +101,10 @@
                 <a tal:condition="here/survey_pointer" tal:attributes="href string:${site/absolute_url}/${here/survey_pointer}" i18n:translate="Take the survey"></a>
             </p>
 
+            <p>
+                <a tal:attributes="href string:${here/absolute_url}/participants" i18n:translate="Participants"></a>
+            </p>
+
             <table border="0" cellspacing="2" cellpadding="2">
                 <tr tal:repeat="record python:here.getDynamicPropertiesTool().getDynamicProperties(here.meta_type)">
                     <th i18n:translate="" tal:content="record/name" />

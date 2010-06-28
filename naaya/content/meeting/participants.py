@@ -3,7 +3,7 @@
 #Zope imports
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
-from AccessControl.Permissions import change_permissions
+from AccessControl.Permissions import change_permissions, view
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from persistent.list import PersistentList
 
@@ -131,7 +131,12 @@ class Participants(SimpleItem):
         organisation = getUserOrganisation(site, uid)
         return {'uid': uid, 'name': name, 'email': email, 'organisation': organisation}
 
-    security.declareProtected(change_permissions, 'index_html')
+    security.declareProtected(view, 'userCanChangePermissions')
+    def userCanChangePermissions(self):
+        """ """
+        return self.checkPermission(change_permissions)
+
+    security.declareProtected(view, 'index_html')
     def index_html(self, REQUEST):
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_participants')

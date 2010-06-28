@@ -371,7 +371,8 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
             self.browser.go('http://localhost/portal/info/mymeeting')
             html = self.browser.get_html()
             self.assertTrue('Access denied' not in html)
-            self.assertTrue('http://localhost/portal/info/mymeeting/participants' not in html)
+            self.assertTrue('http://localhost/portal/info/mymeeting/participants' in html)
+            self.assertTrue('http://localhost/portal/info/mymeeting/edit_html' not in html)
             self.browser_do_logout()
         def assert_admin_access():
             self.browser_do_login('test_participant', 'participant')
@@ -379,6 +380,7 @@ class NyMeetingFunctionalTestCase(NaayaFunctionalTestCase):
             html = self.browser.get_html()
             self.assertTrue('Access denied' not in html)
             self.assertTrue('http://localhost/portal/info/mymeeting/participants' in html)
+            self.assertTrue('http://localhost/portal/info/mymeeting/edit_html' in html)
             self.browser_do_logout()
 
 
