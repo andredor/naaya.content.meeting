@@ -157,7 +157,7 @@ def addNyMeeting(self, id='', REQUEST=None, contributor=None, **kwargs):
 
     # add change permission to administrator
     permission = Permission('Change permissions', (), ob)
-    permission.setRoles(('Administrator',))
+    permission.setRoles(['Administrator',])
 
     if ob.discussion: ob.open_for_comments()
     self.recatalogNyObject(ob)
