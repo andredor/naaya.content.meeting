@@ -6,7 +6,7 @@
     <metal:block fill-slot="body">
     <h1>
         <img tal:attributes="src python:test(here.approved, here.icon, here.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
-        <tal:block tal:replace="here/title_or_id" /> - <span i18n:translate="Newsletter"></span>
+        <tal:block tal:replace="here/title_or_id" /> - <span i18n:translate="Send message to all participants"></span>
     </h1>
 
     <div class="floated-buttons">
@@ -15,7 +15,7 @@
         </span>
     </div>
 
-    <p i18n:translate="This page allows the administrator to send a newsletter (email to all the participants of the meeting). The meeting contact email is used as the sender address."></p>
+    <p i18n:translate="This page allows the administrator to send an email to all the participants of the meeting. The meeting contact email is used as the sender address."></p>
 
     <form method="post" action="send_newsletter" name="formSendNewsletter">
         <div class="field">
