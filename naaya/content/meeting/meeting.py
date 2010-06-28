@@ -41,12 +41,12 @@ DEFAULT_SCHEMA = {
     'location':             dict(sortorder=100, widget_type='String',   label='Meeting location', localized=True),
     'start_date':           dict(sortorder=130, widget_type='Date',     label='Start date', data_type='date', required=True),
     'end_date':             dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
-    'agenda_pointer':       dict(sortorder=210, widget_type='Pointer',  label='Agenda Pointer'),
-    'minutes_pointer':      dict(sortorder=220, widget_type='Pointer',  label='Minutes Pointer'),
-    'survey_pointer':       dict(sortorder=230, widget_type='Pointer',  label='Survey Pointer'),
+    'contact_person':       dict(sortorder=150, widget_type='String',   label='Contact person'),
+    'contact_email':        dict(sortorder=160, widget_type='String',   label='Contact email', required=True),
+    'survey_pointer':       dict(sortorder=230, widget_type='Pointer',  label='Link to the Meeting Survey'),
     'survey_required':      dict(sortorder=240, widget_type='Checkbox', label='Survey Required', data_type='bool'),
-    'contact_person':       dict(sortorder=250, widget_type='String',   label='Contact person'),
-    'contact_email':        dict(sortorder=260, widget_type='String',   label='Contact email', required=True),
+    'agenda_pointer':       dict(sortorder=310, widget_type='Pointer',  label='Link to the Meeting Agenda'),
+    'minutes_pointer':      dict(sortorder=320, widget_type='Pointer',  label='Link to the Meeting Minutes'),
 }
 DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
 
