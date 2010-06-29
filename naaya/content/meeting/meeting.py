@@ -42,10 +42,10 @@ DEFAULT_SCHEMA = {
     'end_date':             dict(sortorder=140, widget_type='Date',     label='End date', data_type='date'),
     'contact_person':       dict(sortorder=150, widget_type='String',   label='Contact person'),
     'contact_email':        dict(sortorder=160, widget_type='String',   label='Contact email', required=True),
-    'survey_pointer':       dict(sortorder=230, widget_type='Pointer',  label='Link to the Meeting Survey'),
+    'survey_pointer':       dict(sortorder=230, widget_type='Pointer',  label='Link to the Meeting Survey', relative=True),
     'survey_required':      dict(sortorder=240, widget_type='Checkbox', label='Survey Required', data_type='bool'),
-    'agenda_pointer':       dict(sortorder=310, widget_type='Pointer',  label='Link to the Meeting Agenda'),
-    'minutes_pointer':      dict(sortorder=320, widget_type='Pointer',  label='Link to the Meeting Minutes'),
+    'agenda_pointer':       dict(sortorder=310, widget_type='Pointer',  label='Link to the Meeting Agenda', relative=True),
+    'minutes_pointer':      dict(sortorder=320, widget_type='Pointer',  label='Link to the Meeting Minutes', relative=True),
 }
 DEFAULT_SCHEMA.update(NY_CONTENT_BASE_SCHEMA)
 DEFAULT_SCHEMA['geo_location'].update(visible=True, required=True)
