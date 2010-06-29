@@ -109,6 +109,7 @@
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=o"
                              i18n:translate="Organisation"></a>
                     </th>
+                    <th><span i18n:translate="Phone number"></span></th>
                     <th>
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=uid"
                              i18n:translate="User ID"></a>
@@ -128,6 +129,9 @@
                     </td>
                     <td tal:define="organisation user_info/organisation">
                         <span tal:condition="organisation" tal:replace="organisation"/>
+                    </td>
+                    <td tal:define="phone user_info/phone">
+                        <span tal:condition="phone" tal:replace="phone"/>
                     </td>
                     <td><span tal:replace="user"/></td>
                     </tal:block>

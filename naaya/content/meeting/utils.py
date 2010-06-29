@@ -42,3 +42,16 @@ def getUserOrganisation(site, uid):
         if user is not None:
             return _encode(user.getProperty('o'))
 
+def getUserPhoneNumber(site, uid):
+    auth_tool = site.getAuthenticationTool()
+    local_user = auth_tool.getUser(uid)
+    if local_user is not None:
+        return ''
+
+    for source in auth_tool.getSources():
+        acl_folder = source.getUserFolder()
+        user = acl_folder.getUserById(uid, None)
+        if user is not None:
+            return _encode(user.getProperty('telephoneNumber'))
+
+

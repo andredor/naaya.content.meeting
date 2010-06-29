@@ -10,7 +10,7 @@ from persistent.list import PersistentList
 #Naaya imports
 from Products.NaayaCore.FormsTool.NaayaTemplate import NaayaPageTemplateFile
 from naaya.content.meeting import PARTICIPANT_ROLE
-from utils import getUserFullName, getUserEmail, getUserOrganisation
+from utils import getUserFullName, getUserEmail, getUserOrganisation, getUserPhoneNumber
 
 class Participants(SimpleItem):
     security = ClassSecurityInfo()
@@ -129,7 +129,8 @@ class Participants(SimpleItem):
         name = getUserFullName(site, uid)
         email = getUserEmail(site, uid)
         organisation = getUserOrganisation(site, uid)
-        return {'uid': uid, 'name': name, 'email': email, 'organisation': organisation}
+        phone = getUserPhoneNumber(site, uid)
+        return {'uid': uid, 'name': name, 'email': email, 'organisation': organisation, 'phone': phone}
 
     security.declareProtected(view, 'userCanChangePermissions')
     def userCanChangePermissions(self):
