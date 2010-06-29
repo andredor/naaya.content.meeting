@@ -4,6 +4,22 @@
     </metal:block>
 
     <metal:block fill-slot="body">
+    <script type="text/javascript">
+    function toggleSelect(checkbox, form_name, name) {
+        var form_array = document.getElementsByName(form_name);
+        if (form_array.length != 1) {
+            alert('Assertion failed: one form with name ' + form_name);
+            return;
+        }
+        var form = form_array[0];
+        for (var i = 0; i < form.elements.length; i++) {
+            var element = form.elements[i];
+            if (element.type == 'checkbox' && element.name == name) {
+                element.checked = checkbox.checked;
+            }
+        }
+    }
+    </script>
     <h1>
         <img tal:attributes="src python:test(here.aq_parent.approved, here.aq_parent.icon, here.aq_parent.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
         <tal:block tal:replace="here/aq_parent/title" /> - <tal:block tal:replace="here/title" />
@@ -51,7 +67,10 @@
                 tal:condition="python:len(users) > 0">
             <table class="datatable" width="95%">
                 <tr>
-                    <th width="30px" i18n:translate="Select"></th>
+                    <th width="30px">
+                        <span i18n:translate="Select"></span>
+                        <input type="checkbox" onclick="javascript:toggleSelect(this, 'formAddUsers', 'uids:list')"/>
+                    </th>
                     <th i18n:translate="User name"></th>
                     <th i18n:translate="User ID"></th>
                     <th width="60%" i18n:translate="Other information"></th>
@@ -96,7 +115,10 @@
         <form method="post" action="removeUsers" name="formDeleteUsers">
             <table class="datatable" width="95%">
                 <tr>
-                    <th tal:condition="here/userCanChangePermissions" width="30px" i18n:translate="Select"></th>
+                    <th tal:condition="here/userCanChangePermissions" width="30px">
+                        <span i18n:translate="Select"></span>
+                        <input type="checkbox" onclick="javascript:toggleSelect(this, 'formDeleteUsers', 'uids:list')"/>
+                    </th>
                     <th>
                         <a tal:attributes="href string:${request/ACTUAL_URL}?sort_on=name"
                              i18n:translate="Name"></a>
