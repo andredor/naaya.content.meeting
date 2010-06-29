@@ -387,7 +387,7 @@ class NyMeeting(NyContentData, NyFolder):
 
         loc = []
         if self.geo_address():
-            loc.append(self.self.geo_address)
+            loc.append(self.geo_address())
 
         if loc:
             cal.vevent.add('location').value = ', '.join(loc)
