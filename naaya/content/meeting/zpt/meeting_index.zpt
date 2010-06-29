@@ -49,6 +49,9 @@
             <!-- Map widget -->
             <tal:block content="structure python:here.portal_map.render_object_map(here.geo_location)"/>
 
+            <p tal:condition="python:here.description!=''"
+                tal:content="structure here/description" />
+
             <p><a tal:attributes="href string:${here/absolute_url}/get_ics"
                   i18n:translate="Download as iCalendar"></a></p>
 
@@ -111,9 +114,6 @@
                     <td tal:content="python:here.getPropertyValue(record.id)"/>
                 </tr>
             </table>
-
-            <p tal:condition="python:here.description!=''"
-                tal:content="structure here/description" />
 
             <!-- Make sure the folder listing is displayed after the map -->
             <div style="clear: both"></div>
