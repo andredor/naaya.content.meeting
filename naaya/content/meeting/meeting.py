@@ -83,7 +83,7 @@ def meeting_on_install(site):
     """
     grouppermissions = ['Browse content', 'Add comments']
     permissions = ['Naaya - Skip Captcha',
-        'Naaya - Add Naaya Survey Answer', 'Naaya - View Naaya Survey Answers']
+        'Naaya - Add Naaya Survey Answer', 'Naaya - View Naaya Survey Answers', 'Naaya - View Naaya Survey Reports']
 
     auth_tool = site.getAuthenticationTool()
 
