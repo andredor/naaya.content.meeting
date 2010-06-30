@@ -60,6 +60,26 @@ class Participants(SimpleItem):
 
         return ret
 
+    def findUsersWithRole(self, search_role):
+        """ """
+        auth_tool = self.getAuthenticationTool()
+        ret = []
+
+        for source in auth_tool.getSources():
+            acl_folder = source.getUserFolder()
+            users = source.getUsersByRole(acl_folder, [(search_role, None)])
+            for user in users:
+                uid = user['uid']
+                if isinstance(uid, list):
+                    uid = uid[0]
+                cn = user['cn']
+                if isinstance(cn, list):
+                    cn = cn[0]
+                info = user['dn']
+                ret.append({'uid': uid, 'cn': cn, 'info': info})
+
+        return ret
+
     def _add_user(self, uid):
         if uid in self.uids:
             return
@@ -142,5 +162,10 @@ class Participants(SimpleItem):
         """ """
         return self.getFormsTool().getContent({'here': self}, 'meeting_participants')
 
-NaayaPageTemplateFile('zpt/participants_index', globals(), 'meeting_participants')
+    security.declareProtected(view, 'pickrole_html')
+    def pickrole_html(self, REQUEST):
+        """ """
+        return self.getFormsTool().getContent({'here': self}, 'meeting_participants_pickrole')
 
+NaayaPageTemplateFile('zpt/participants_index', globals(), 'meeting_participants')
+NaayaPageTemplateFile('zpt/participants_pickrole', globals(), 'meeting_participants_pickrole')

@@ -19,6 +19,15 @@
             }
         }
     }
+
+    function pickRole(url) {
+        var wnd = window.open(url, "Pick Role", "height=400,width=500,status=no,resizable=no,toolbar=no,menubar=no,location=no,scrollbars=yes");
+        wnd.focus();
+    }
+    function setRole(role) {
+        document.getElementById('search_role').value = role;
+    }
+
     </script>
     <h1>
         <img tal:attributes="src python:test(here.aq_parent.approved, here.aq_parent.icon, here.aq_parent.icon_marked); title here/get_meta_label; alt here/get_meta_label" />
@@ -26,6 +35,9 @@
     </h1>
 
     <div class="floated-buttons">
+        <span class="buttons">
+            <a tal:attributes="href here/absolute_url" i18n:translate="Clear page"></a>
+        </span>
         <span class="buttons">
             <a tal:attributes="href here/aq_parent/absolute_url" i18n:translate="Back to index"></a>
         </span>
@@ -37,6 +49,7 @@
     <fieldset tal:condition="here/userCanChangePermissions">
         <legend i18n:translate="Search and Add Users"></legend>
         <p i18n:translate="Use this form to find EIONET LDAP or local users and assign them to the meeting."></p>
+
         <tal:block define="
             search_param python:request.get('search_param', '');
             search_term python:request.get('search_term', '');
@@ -86,6 +99,52 @@
             <input type="submit" name="add_users" value="Add selected users"/>
         </form>
         <div tal:condition="python:len(users) == 0" i18n:translate="No users matched selected criteria."></div>
+        </tal:block>
+        </tal:block>
+
+        </tal:block>
+
+        <br />
+
+        <tal:block define="
+            search_role python:request.get('search_role', '');
+            auth_tool here/getAuthenticationTool;
+            do_search python:request.has_key('search_user_with_role')">
+        <form method="get" action="." name="formSearchRoles">
+            <label for="search_role" i18n:translate="Search users with role"></label>
+            <input type="text" id="search_role" name="search_role:utf8:ustring"
+                tal:attributes="value search_role"/>
+            <input type="button" name="pickroles" value="Pick Role"
+                tal:attributes="onclick string:javascript:pickRole('${here/absolute_url}/pickrole_html')"/>
+            <input type="submit" name="search_user_with_role" value="Search" />
+        </form>
+
+        <tal:block condition="do_search">
+        <tal:block define="users python:here.findUsersWithRole(search_role)">
+        <form method="post" action="addUsers" name="formAddUsers2"
+                tal:condition="python:len(users) > 0">
+            <table class="datatable" width="95%">
+                <tr>
+                    <th width="30px">
+                        <span i18n:translate="Select"></span>
+                        <input type="checkbox" onclick="javascript:toggleSelect(this, 'formAddUsers2', 'uids:list')"/>
+                    </th>
+                    <th i18n:translate="User name"></th>
+                    <th i18n:translate="User ID"></th>
+                    <th width="60%" i18n:translate="Other information"></th>
+                </tr>
+                <tr tal:repeat="item users"
+                        tal:attributes="class python:test(path('repeat/item/odd'), 'odd', 'even')">
+                    <td><input type="checkbox" name="uids:list" tal:attributes="value item/uid"/></td>
+                    <td><span tal:replace="item/cn"/></td>
+                    <td><span tal:replace="item/uid"/></td>
+                    <td><span tal:replace="item/info"/></td>
+                </tr>
+            </table>
+            <input type="submit" name="add_users" value="Add selected users"/>
+        </form>
+        <div tal:condition="python:len(users) == 0" i18n:translate="No users matched selected criteria."></div>
+
         </tal:block>
         </tal:block>
 
